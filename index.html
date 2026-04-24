@@ -1,0 +1,133 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMART | Premium Shopping Experience</title>
+  <meta name="description" content="EMART lets you explore quality products at the best prices with a premium shopping experience." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="home">
+  <div class="page-shell">
+    <header class="navbar glass-panel">
+      <a class="brand" href="index.html" aria-label="EMART Home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
+            <defs>
+              <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8f6dff" />
+                <stop offset="45%" stop-color="#39d4ff" />
+                <stop offset="100%" stop-color="#5f8dff" />
+              </linearGradient>
+            </defs>
+            <path d="M16 14h30a5 5 0 0 1 0 10H26v8h18a5 5 0 0 1 0 10H26v8h20a5 5 0 0 1 0 10H16z" fill="url(#brandGradient)"/>
+            <path d="M41 18h7l4 18H28" fill="none" stroke="#e6f8ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+            <circle cx="34" cy="50" r="3" fill="#e6f8ff"/>
+            <circle cx="47" cy="50" r="3" fill="#e6f8ff"/>
+          </svg>
+        </span>
+        <span>
+          <strong>EMART</strong>
+          <small>Premium everyday shopping</small>
+        </span>
+      </a>
+
+      <button class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="navPanel" aria-label="Open navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="nav-panel" id="navPanel">
+        <form class="nav-search" action="products.html">
+          <span class="search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 1 1 0 13a6.5 6.5 0 0 1 0-13Zm0 0 8.5 8.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <input type="search" name="q" placeholder="Search for gadgets, fashion, home picks" aria-label="Search products" />
+        </form>
+
+        <nav class="nav-actions">
+          <a class="icon-button" href="products.html" aria-label="View cart">
+            <svg viewBox="0 0 24 24"><path d="M3 5h2l2.4 9.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L21 8H7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19" r="1.5"/><circle cx="18" cy="19" r="1.5"/></svg>
+          </a>
+          <a class="ghost-button" href="products.html">Login / Signup</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero section-grid">
+        <div class="hero-copy reveal">
+          <span class="eyebrow">Glossy shopping experience, built for speed</span>
+          <h1>Shop Smarter. Buy Better.</h1>
+          <p>Explore quality products at the best prices.</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="products.html">Start Shopping</a>
+            <a class="secondary-button" href="#best-deals">See Best Deals</a>
+          </div>
+          <ul class="hero-metrics" aria-label="EMART highlights">
+            <li><strong>25k+</strong><span>Products</span></li>
+            <li><strong>4.8/5</strong><span>Customer rating</span></li>
+            <li><strong>24hr</strong><span>Fast dispatch</span></li>
+          </ul>
+        </div>
+
+        <div class="hero-visual glass-panel reveal-delay">
+          <div class="orb orb-one"></div>
+          <div class="orb orb-two"></div>
+          <div class="hero-card hero-card-main">
+            <span class="hero-chip">New Season Drops</span>
+            <h3>Premium picks for daily life.</h3>
+            <p>Clean discovery, glossy surfaces, and standout deals across every category.</p>
+          </div>
+          <div class="hero-card hero-card-floating">
+            <span class="mini-label">Hot today</span>
+            <div class="hero-spotlight">
+              <strong>Up to 40% off</strong>
+              <span>Tech, fashion, home and more</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-block categories-block reveal">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">Top categories</span>
+            <h2>Shop by category</h2>
+          </div>
+          <a class="text-link" href="products.html">See all</a>
+        </div>
+        <div class="category-row" id="categoryRow"></div>
+      </section>
+
+      <section class="section-block featured-block reveal">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">Featured products</span>
+            <h2>Curated for premium shopping</h2>
+          </div>
+          <a class="text-link" href="products.html">Browse catalog</a>
+        </div>
+        <div class="product-grid" id="featuredProducts"></div>
+      </section>
+
+      <section class="section-block deals-block reveal" id="best-deals">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">Best deals</span>
+            <h2>Worth adding to cart</h2>
+          </div>
+          <a class="text-link" href="products.html?deal=top">View deals</a>
+        </div>
+        <div class="deals-grid" id="bestDeals"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

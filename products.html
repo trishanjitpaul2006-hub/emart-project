@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMART Products | Premium Product Listing</title>
+  <meta name="description" content="Browse EMART's premium product collection with modern filters and glossy product cards." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="products">
+  <div class="page-shell">
+    <header class="navbar glass-panel">
+      <a class="brand" href="index.html" aria-label="EMART Home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
+            <defs>
+              <linearGradient id="brandGradientProducts" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8f6dff" />
+                <stop offset="45%" stop-color="#39d4ff" />
+                <stop offset="100%" stop-color="#5f8dff" />
+              </linearGradient>
+            </defs>
+            <path d="M16 14h30a5 5 0 0 1 0 10H26v8h18a5 5 0 0 1 0 10H26v8h20a5 5 0 0 1 0 10H16z" fill="url(#brandGradientProducts)"/>
+            <path d="M41 18h7l4 18H28" fill="none" stroke="#e6f8ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+            <circle cx="34" cy="50" r="3" fill="#e6f8ff"/>
+            <circle cx="47" cy="50" r="3" fill="#e6f8ff"/>
+          </svg>
+        </span>
+        <span>
+          <strong>EMART</strong>
+          <small>Premium everyday shopping</small>
+        </span>
+      </a>
+
+      <button class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="navPanel" aria-label="Open navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="nav-panel" id="navPanel">
+        <form class="nav-search" action="products.html">
+          <span class="search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 1 1 0 13a6.5 6.5 0 0 1 0-13Zm0 0 8.5 8.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <input type="search" name="q" placeholder="Search products, categories, collections" aria-label="Search products" />
+        </form>
+
+        <nav class="nav-actions">
+          <a class="icon-button" href="products.html" aria-label="View cart">
+            <svg viewBox="0 0 24 24"><path d="M3 5h2l2.4 9.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L21 8H7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19" r="1.5"/><circle cx="18" cy="19" r="1.5"/></svg>
+          </a>
+          <a class="ghost-button" href="index.html">Home</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="catalog-hero section-block reveal">
+        <div>
+          <span class="eyebrow">Premium catalog</span>
+          <h1>Discover better deals every day</h1>
+          <p>Browse glossy product cards, sharp filters, and clean pricing built for high-conversion shopping.</p>
+        </div>
+        <div class="catalog-actions">
+          <button class="filter-pill active" type="button" data-quick-filter="all">All</button>
+          <button class="filter-pill" type="button" data-quick-filter="electronics">Electronics</button>
+          <button class="filter-pill" type="button" data-quick-filter="fashion">Fashion</button>
+          <button class="filter-pill" type="button" data-quick-filter="home">Home</button>
+          <button class="filter-pill" type="button" data-quick-filter="deal">Best Deals</button>
+        </div>
+      </section>
+
+      <section class="section-block catalog-layout">
+        <aside class="catalog-sidebar glass-panel reveal-delay">
+          <div>
+            <span class="eyebrow">Filters</span>
+            <h2>Refine your picks</h2>
+          </div>
+
+          <div class="sidebar-group">
+            <span class="sidebar-label">Category</span>
+            <div class="filter-stack" id="categoryFilters"></div>
+          </div>
+
+          <div class="sidebar-group">
+            <span class="sidebar-label">Price range</span>
+            <div class="filter-stack" id="priceFilters"></div>
+          </div>
+
+          <div class="sidebar-group">
+            <span class="sidebar-label">Rating</span>
+            <div class="filter-stack" id="ratingFilters"></div>
+          </div>
+
+          <div class="sidebar-group">
+            <span class="sidebar-label">Discount</span>
+            <div class="filter-stack" id="discountFilters"></div>
+          </div>
+
+          <button class="secondary-button sidebar-button" type="button" id="clearFilters">Reset filters</button>
+        </aside>
+
+        <div class="catalog-main reveal">
+          <div class="catalog-toolbar glass-panel">
+            <div>
+              <span class="eyebrow">Live selection</span>
+              <h2 id="catalogHeading">All products</h2>
+            </div>
+            <span class="catalog-count" id="productCount">0 items</span>
+          </div>
+          <div class="product-grid" id="allProducts"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
