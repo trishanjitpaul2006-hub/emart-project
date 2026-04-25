@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMART Add Product | Vendor Form</title>
+  <meta name="description" content="Add product UI for vendors in the EMART premium dashboard experience." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="add-product">
+  <div class="page-shell page-shell-medium">
+    <header class="navbar glass-panel">
+      <a class="brand" href="index.html" aria-label="EMART Home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
+            <defs>
+              <linearGradient id="brandGradientAddProduct" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8f6dff" />
+                <stop offset="45%" stop-color="#39d4ff" />
+                <stop offset="100%" stop-color="#5f8dff" />
+              </linearGradient>
+            </defs>
+            <path d="M16 14h30a5 5 0 0 1 0 10H26v8h18a5 5 0 0 1 0 10H26v8h20a5 5 0 0 1 0 10H16z" fill="url(#brandGradientAddProduct)"/>
+            <path d="M41 18h7l4 18H28" fill="none" stroke="#e6f8ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+            <circle cx="34" cy="50" r="3" fill="#e6f8ff"/>
+            <circle cx="47" cy="50" r="3" fill="#e6f8ff"/>
+          </svg>
+        </span>
+        <span>
+          <strong>EMART</strong>
+          <small>Vendor tools</small>
+        </span>
+      </a>
+      <div class="nav-actions">
+        <a class="ghost-button" href="dashboard.html">Back to Dashboard</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="section-block reveal">
+        <div class="section-heading compact-center">
+          <span class="eyebrow">Vendor form</span>
+          <h1>Add a new product</h1>
+          <p>Frontend-only form UI, structured for future backend and database integration.</p>
+        </div>
+        <form class="form-card glass-panel product-form" id="addProductForm">
+          <div class="form-grid two-col">
+            <label class="form-field">
+              <span>Product name</span>
+              <input type="text" placeholder="Enter product name" />
+            </label>
+            <label class="form-field">
+              <span>Category</span>
+              <select>
+                <option>Electronics</option>
+                <option>Fashion</option>
+                <option>Home</option>
+                <option>Beauty</option>
+                <option>Grocery</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>Price</span>
+              <input type="number" placeholder="2499" />
+            </label>
+            <label class="form-field">
+              <span>Stock</span>
+              <input type="number" placeholder="48" />
+            </label>
+            <label class="form-field">
+              <span>Image URL</span>
+              <input type="text" placeholder="Paste product image URL" />
+            </label>
+            <label class="form-field">
+              <span>Discount</span>
+              <input type="number" placeholder="20" />
+            </label>
+          </div>
+          <label class="form-field">
+            <span>Description</span>
+            <textarea rows="5" placeholder="Write a concise product description"></textarea>
+          </label>
+          <button class="primary-button form-button" type="button" data-loading-button>Save Product</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

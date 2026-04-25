@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMART Vendor Dashboard</title>
+  <meta name="description" content="Premium dark vendor dashboard UI for EMART with floating actions, glass cards, analytics, and order management." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="dashboard" class="vendor-body">
+  <div class="vendor-layout">
+    <aside class="vendor-sidebar glass-panel" data-sidebar>
+      <div class="sidebar-inner">
+        <a class="vendor-brand" href="index.html" aria-label="EMART Home">
+          <span class="vendor-brand-mark" aria-hidden="true">E</span>
+          <span class="vendor-brand-copy">
+            <strong>EMART</strong>
+            <small>Vendor Console</small>
+          </span>
+        </a>
+
+        <nav class="vendor-menu" aria-label="Sidebar">
+          <a class="vendor-menu-link is-active" href="dashboard.html" data-menu-item>
+            <span class="menu-icon">
+              <svg viewBox="0 0 24 24"><path d="M4 5h7v6H4zM13 5h7v10h-7zM4 13h7v6H4zM13 17h7v2h-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="menu-label">Dashboard</span>
+          </a>
+          <a class="vendor-menu-link" href="products.html" data-menu-item>
+            <span class="menu-icon">
+              <svg viewBox="0 0 24 24"><path d="M6 7.5 12 4l6 3.5v9L12 20l-6-3.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6 7.5 12 11l6-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="menu-label">Products</span>
+          </a>
+          <a class="vendor-menu-link" href="#categories" data-menu-item>
+            <span class="menu-icon">
+              <svg viewBox="0 0 24 24"><path d="M5 5h6v6H5zM13 5h6v6h-6zM5 13h6v6H5zM13 13h6v6h-6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="menu-label">Categories</span>
+          </a>
+          <a class="vendor-menu-link" href="#recent-orders" data-menu-item>
+            <span class="menu-icon">
+              <svg viewBox="0 0 24 24"><path d="M7 4h10l2 3v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 10h6M9 14h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </span>
+            <span class="menu-label">Orders</span>
+          </a>
+          <a class="vendor-menu-link" href="#customers" data-menu-item>
+            <span class="menu-icon">
+              <svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0M12 12a4 4 0 1 0 0-8a4 4 0 0 0 0 8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </span>
+            <span class="menu-label">Customers</span>
+          </a>
+          <a class="vendor-menu-link" href="testimonials.html" data-menu-item>
+            <span class="menu-icon">
+              <svg viewBox="0 0 24 24"><path d="M7 10h6M7 14h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M5 5h14v10a2 2 0 0 1-2 2H9l-4 3v-5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="menu-label">Reviews</span>
+          </a>
+          <a class="vendor-menu-link" href="testimonials.html" data-menu-item>
+            <span class="menu-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 6v6l4 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+            </span>
+            <span class="menu-label">Testimonials</span>
+          </a>
+          <a class="vendor-menu-link" href="#reports" data-menu-item>
+            <span class="menu-icon">
+              <svg viewBox="0 0 24 24"><path d="M6 18V9M12 18V6M18 18v-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 20h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </span>
+            <span class="menu-label">Reports</span>
+          </a>
+          <a class="vendor-menu-link" href="#settings" data-menu-item>
+            <span class="menu-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19 12a7.4 7.4 0 0 0-.1-1l2-1.5-2-3.4-2.4 1a7.7 7.7 0 0 0-1.7-1l-.3-2.5h-4l-.3 2.5a7.7 7.7 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5a7.4 7.4 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a7.7 7.7 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7.7 7.7 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5c.1-.3.1-.7.1-1Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="menu-label">Settings</span>
+          </a>
+        </nav>
+
+        <button class="sidebar-collapse" type="button" data-sidebar-toggle aria-label="Collapse sidebar">
+          <span class="menu-icon">
+            <svg viewBox="0 0 24 24"><path d="m14 7-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="menu-label">Collapse</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="vendor-main">
+      <header class="vendor-topbar glass-panel">
+        <div>
+          <span class="eyebrow">Vendor workspace</span>
+          <h1>Dashboard Overview</h1>
+        </div>
+
+        <div class="topbar-actions">
+          <label class="topbar-search">
+            <span class="search-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 1 1 0 13a6.5 6.5 0 0 1 0-13Zm0 0 8.5 8.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+            <input type="search" placeholder="Search orders, products, customers" data-dashboard-search />
+          </label>
+
+          <div class="notification-wrap">
+            <button class="topbar-icon-button" type="button" data-notification-toggle aria-expanded="false" aria-label="Notifications">
+              <svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0v4l1.5 3h-15L6 13z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 18a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <span class="notification-dot"></span>
+            </button>
+            <div class="notification-dropdown glass-panel" data-notification-menu hidden>
+              <div class="dropdown-head">
+                <strong>Notifications</strong>
+                <span>3 new</span>
+              </div>
+              <div class="notification-item">
+                <strong>18 new orders</strong>
+                <span>Peak traffic in the last 2 hours.</span>
+              </div>
+              <div class="notification-item">
+                <strong>Low stock warning</strong>
+                <span>Nova X Headphones need a restock soon.</span>
+              </div>
+              <div class="notification-item">
+                <strong>Review spike</strong>
+                <span>Customer feedback jumped 22% today.</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="profile-button" type="button">
+            <span class="profile-avatar">TA</span>
+            <span class="profile-copy">
+              <strong>Trisha Admin</strong>
+              <small>Vendor Admin</small>
+            </span>
+          </button>
+
+          <a class="logout-button" href="login.html">Logout</a>
+        </div>
+      </header>
+
+      <section class="vendor-hero">
+        <article class="hero-overview glass-panel">
+          <div class="hero-overview-copy">
+            <span class="eyebrow">Today at a glance</span>
+            <h2>Run your EMART store with calm, clean control.</h2>
+            <p>Track orders, watch growth signals, respond to reviews, and launch quick actions from one polished dark workspace.</p>
+          </div>
+          <div class="hero-pills">
+            <span class="hero-pill active">Live Orders +12%</span>
+            <span class="hero-pill">Return Rate 1.9%</span>
+            <span class="hero-pill">Store Health Strong</span>
+          </div>
+        </article>
+
+        <article class="hero-spotlight-card glass-panel" id="reports">
+          <span class="mini-label">Sales overview</span>
+          <strong>&#8377;4.86L</strong>
+          <p>Revenue this month with a steady conversion lift across electronics and home categories.</p>
+          <div class="hero-spotlight-meter">
+            <span>+18.4%</span>
+            <small>vs last month</small>
+          </div>
+        </article>
+      </section>
+
+      <section class="vendor-stats-grid" id="dashboardStats"></section>
+
+      <section class="vendor-content-grid">
+        <article class="vendor-panel glass-panel wide-panel">
+          <div class="panel-head">
+            <div>
+              <span class="eyebrow">Performance</span>
+              <h2>Sales overview</h2>
+            </div>
+            <span class="panel-tag">Last 7 days</span>
+          </div>
+          <div class="sales-chart" id="salesChart"></div>
+          <div class="chart-footer">
+            <div>
+              <strong>Conversion</strong>
+              <span>3.84%</span>
+            </div>
+            <div>
+              <strong>Avg. order value</strong>
+              <span>&#8377;2,740</span>
+            </div>
+            <div>
+              <strong>Returning customers</strong>
+              <span>41%</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="vendor-panel glass-panel" id="categories">
+          <div class="panel-head">
+            <div>
+              <span class="eyebrow">Low stock</span>
+              <h2>Alerts</h2>
+            </div>
+            <span class="panel-tag warning">Needs attention</span>
+          </div>
+          <div class="alert-stack" id="lowStockAlerts"></div>
+        </article>
+      </section>
+
+      <section class="vendor-content-grid">
+        <article class="vendor-panel glass-panel wide-panel" id="recent-orders">
+          <div class="panel-head">
+            <div>
+              <span class="eyebrow">Order management</span>
+              <h2>Recent orders</h2>
+            </div>
+            <span class="panel-tag">Live feed</span>
+          </div>
+          <div class="vendor-table-wrap">
+            <table class="vendor-table" id="ordersTable">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Product</th>
+                  <th>Status</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="vendor-panel glass-panel" id="customers">
+          <div class="panel-head">
+            <div>
+              <span class="eyebrow">Community</span>
+              <h2>Customer pulse</h2>
+            </div>
+          </div>
+          <div class="customer-pulse">
+            <article class="pulse-item">
+              <strong>1,248</strong>
+              <span>Active customers this month</span>
+            </article>
+            <article class="pulse-item">
+              <strong>94%</strong>
+              <span>Positive review trend</span>
+            </article>
+            <article class="pulse-item">
+              <strong>312</strong>
+              <span>Support chats resolved</span>
+            </article>
+          </div>
+          <a class="panel-link" href="testimonials.html">Open testimonials</a>
+        </article>
+      </section>
+
+      <section class="vendor-content-grid">
+        <article class="vendor-panel glass-panel wide-panel">
+          <div class="panel-head">
+            <div>
+              <span class="eyebrow">Catalog health</span>
+              <h2>Product list</h2>
+            </div>
+            <span class="panel-tag success">Updated 5 min ago</span>
+          </div>
+          <div class="vendor-table-wrap">
+            <table class="vendor-table" id="productsTable">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Stock</th>
+                  <th>Price</th>
+                  <th>Rating</th>
+                </tr>
+              </thead>
+              <tbody id="productsTableBody"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="vendor-panel glass-panel">
+          <div class="panel-head">
+            <div>
+              <span class="eyebrow">Reviews</span>
+              <h2>Testimonials snapshot</h2>
+            </div>
+          </div>
+          <div class="testimonial-preview-grid" id="testimonialPreview"></div>
+        </article>
+      </section>
+
+      <section class="floating-actions" data-fab>
+        <button class="floating-toggle" type="button" data-fab-toggle aria-expanded="false" aria-label="Open quick actions">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+
+        <div class="floating-actions-menu">
+          <button class="floating-action" type="button" data-tooltip="Add Product">
+            <span class="floating-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+            <span class="floating-action-label">Add Product</span>
+          </button>
+          <button class="floating-action" type="button" data-tooltip="New Category">
+            <span class="floating-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M5 5h6v6H5zM13 13h6v6h-6zM13 5h6v6h-6zM5 13h6v6H5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="floating-action-label">New Category</span>
+          </button>
+          <button class="floating-action" type="button" data-tooltip="View Orders">
+            <span class="floating-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M7 4h10l2 3v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 10h6M9 14h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </span>
+            <span class="floating-action-label">View Orders</span>
+          </button>
+          <button class="floating-action" type="button" data-tooltip="Chat Support">
+            <span class="floating-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M7 10h10M7 14h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M5 5h14v10a2 2 0 0 1-2 2H9l-4 3v-5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="floating-action-label">Chat Support</span>
+          </button>
+          <button class="floating-action" type="button" data-tooltip="Settings">
+            <span class="floating-action-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19 12a7.4 7.4 0 0 0-.1-1l2-1.5-2-3.4-2.4 1a7.7 7.7 0 0 0-1.7-1l-.3-2.5h-4l-.3 2.5a7.7 7.7 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5a7.4 7.4 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a7.7 7.7 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7.7 7.7 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5c.1-.3.1-.7.1-1Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="floating-action-label">Settings</span>
+          </button>
+        </div>
+      </section>
+
+      <nav class="mobile-bottom-nav glass-panel" aria-label="Mobile navigation">
+        <button class="mobile-nav-item is-active" type="button" data-bottom-nav>
+          <svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-5H9v5H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="mobile-nav-item" type="button" data-bottom-nav>
+          <svg viewBox="0 0 24 24"><path d="M6 7.5 12 4l6 3.5v9L12 20l-6-3.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="mobile-nav-item" type="button" data-bottom-nav>
+          <svg viewBox="0 0 24 24"><path d="M7 4h10l2 3v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="mobile-nav-item" type="button" data-bottom-nav>
+          <svg viewBox="0 0 24 24"><path d="M6 18V9M12 18V6M18 18v-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 20h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+        <button class="mobile-nav-item" type="button" data-bottom-nav>
+          <svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0M12 12a4 4 0 1 0 0-8a4 4 0 0 0 0 8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </nav>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

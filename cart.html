@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMART Cart | Review Your Items</title>
+  <meta name="description" content="Review your EMART cart, adjust quantity, and continue to checkout." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="cart">
+  <div class="page-shell">
+    <header class="navbar glass-panel">
+      <a class="brand" href="index.html" aria-label="EMART Home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
+            <defs>
+              <linearGradient id="brandGradientCart" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8f6dff" />
+                <stop offset="45%" stop-color="#39d4ff" />
+                <stop offset="100%" stop-color="#5f8dff" />
+              </linearGradient>
+            </defs>
+            <path d="M16 14h30a5 5 0 0 1 0 10H26v8h18a5 5 0 0 1 0 10H26v8h20a5 5 0 0 1 0 10H16z" fill="url(#brandGradientCart)"/>
+            <path d="M41 18h7l4 18H28" fill="none" stroke="#e6f8ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+            <circle cx="34" cy="50" r="3" fill="#e6f8ff"/>
+            <circle cx="47" cy="50" r="3" fill="#e6f8ff"/>
+          </svg>
+        </span>
+        <span>
+          <strong>EMART</strong>
+          <small>Premium everyday shopping</small>
+        </span>
+      </a>
+
+      <button class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="navPanel" aria-label="Open navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="nav-panel" id="navPanel">
+        <nav class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="products.html" class="nav-link">Products</a>
+          <a href="cart.html" class="nav-link active">Cart</a>
+          <a href="login.html" class="nav-link">Login</a>
+        </nav>
+        <div class="nav-actions">
+          <a class="ghost-button" href="products.html">Continue Shopping</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="section-block page-intro reveal">
+        <span class="eyebrow">Cart</span>
+        <h1>Review your items</h1>
+        <p>Clean cart flow with quantity control, totals, and a clear checkout path.</p>
+      </section>
+
+      <section class="section-block cart-layout">
+        <div class="cart-items glass-panel reveal" id="cartItems"></div>
+        <aside class="cart-summary glass-panel reveal-delay" id="cartSummary"></aside>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
