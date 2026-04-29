@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>EMART Vendor Orders</title><link rel="stylesheet" href="style.css" /><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" /></head>
+<body data-page="vendor-orders" class="vendor-body">
+  <div class="vendor-layout">
+    <aside class="vendor-sidebar glass-panel"><div class="sidebar-inner"><a class="vendor-brand" href="index.html"><span class="vendor-brand-mark">E</span><span class="vendor-brand-copy"><strong>EMART</strong><small>Vendor Console</small></span></a><nav class="vendor-menu"><a class="vendor-menu-link" href="vendor-dashboard.html">Vendor Dashboard</a><a class="vendor-menu-link" href="add-product.html">Add Product</a><a class="vendor-menu-link" href="manage-products.html">Manage Products</a><a class="vendor-menu-link is-active" href="vendor-orders.html">Vendor Orders</a><button class="vendor-menu-link logout-menu-button" type="button" data-logout>Logout</button></nav></div></aside>
+    <main class="vendor-main"><header class="vendor-topbar glass-panel"><div><span class="eyebrow">Vendor</span><h1>Vendor Orders</h1></div><button class="logout-button" type="button" data-logout>Logout</button></header><section class="vendor-content-grid single-column"><article class="vendor-panel glass-panel"><div class="vendor-table-wrap"><table class="vendor-table"><thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody id="vendorOrdersBody"></tbody></table></div></article></section></main>
+  </div><script src="script.js"></script>
+</body>
+</html>

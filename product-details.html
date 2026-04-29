@@ -13,14 +13,20 @@
 <body data-page="product-details">
   <div class="page-shell">
     <header class="navbar glass-panel">
+      <button id="menuToggle" class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="sideMenu" aria-label="Open menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
       <a class="brand" href="index.html" aria-label="EMART Home">
         <span class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
             <defs>
               <linearGradient id="brandGradientDetails" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#8f6dff" />
-                <stop offset="45%" stop-color="#39d4ff" />
-                <stop offset="100%" stop-color="#5f8dff" />
+                <stop offset="0%" stop-color="#ff7a00" />
+                <stop offset="45%" stop-color="#ff9f43" />
+                <stop offset="100%" stop-color="#ffb86b" />
               </linearGradient>
             </defs>
             <path d="M16 14h30a5 5 0 0 1 0 10H26v8h18a5 5 0 0 1 0 10H26v8h20a5 5 0 0 1 0 10H16z" fill="url(#brandGradientDetails)"/>
@@ -35,23 +41,28 @@
         </span>
       </a>
 
-      <button class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="navPanel" aria-label="Open navigation">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
+      <a class="header-cart" href="cart.html" aria-label="View cart">
+        <svg viewBox="0 0 24 24"><path d="M3 5h2l2.4 9.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L21 8H7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19" r="1.5"/><circle cx="18" cy="19" r="1.5"/></svg>
+        <span class="cart-count" data-cart-count hidden>0</span>
+      </a>
 
       <div class="nav-panel" id="navPanel">
         <nav class="nav-links">
           <a href="index.html" class="nav-link">Home</a>
           <a href="products.html" class="nav-link">Products</a>
           <a href="cart.html" class="nav-link">Cart</a>
-          <a href="login.html" class="nav-link">Login</a>
+          <a href="testimonials.html" class="nav-link">Testimonials</a>
+          <a href="vendor-dashboard.html" class="nav-link" data-role-only="vendor" hidden>Vendor Dashboard</a>
+          <a href="admin-dashboard.html" class="nav-link" data-role-only="admin" hidden>Admin Dashboard</a>
+          <a href="add-product.html" class="nav-link" data-role-only="vendor admin" hidden>Add Product</a>
         </nav>
         <div class="nav-actions">
           <a class="icon-button" href="cart.html" aria-label="View cart">
             <svg viewBox="0 0 24 24"><path d="M3 5h2l2.4 9.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L21 8H7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19" r="1.5"/><circle cx="18" cy="19" r="1.5"/></svg>
+            <span class="cart-count" data-cart-count hidden>0</span>
           </a>
+          <a class="auth-button login-button" href="login.html" data-guest-only>Login / Admin</a>
+          <button class="auth-button signup-button" type="button" data-role-only="customer vendor admin" data-logout hidden>Logout</button>
         </div>
       </div>
     </header>

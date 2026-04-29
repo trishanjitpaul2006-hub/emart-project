@@ -4,209 +4,82 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EMART Testimonials</title>
-  <meta name="description" content="Customer testimonials management page for the EMART vendor dashboard." />
+  <meta name="description" content="Customer testimonials for EMART." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body data-page="testimonials" class="vendor-body">
-  <div class="vendor-layout">
-    <aside class="vendor-sidebar glass-panel" data-sidebar>
-      <div class="sidebar-inner">
-        <a class="vendor-brand" href="index.html" aria-label="EMART Home">
-          <span class="vendor-brand-mark" aria-hidden="true">E</span>
-          <span class="vendor-brand-copy">
-            <strong>EMART</strong>
-            <small>Vendor Console</small>
-          </span>
-        </a>
-
-        <nav class="vendor-menu" aria-label="Sidebar">
-          <a class="vendor-menu-link" href="dashboard.html" data-menu-item>
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24"><path d="M4 5h7v6H4zM13 5h7v10h-7zM4 13h7v6H4zM13 17h7v2h-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="menu-label">Dashboard</span>
-          </a>
-          <a class="vendor-menu-link" href="products.html" data-menu-item>
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24"><path d="M6 7.5 12 4l6 3.5v9L12 20l-6-3.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="menu-label">Product Management</span>
-          </a>
-          <a class="vendor-menu-link" href="dashboard.html#categories" data-menu-item>
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24"><path d="M5 5h6v6H5zM13 5h6v6h-6zM5 13h6v6H5zM13 13h6v6h-6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="menu-label">Categories</span>
-          </a>
-          <a class="vendor-menu-link" href="dashboard.html#recent-orders" data-menu-item>
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24"><path d="M7 4h10l2 3v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="menu-label">Orders</span>
-          </a>
-          <a class="vendor-menu-link" href="dashboard.html#customers" data-menu-item>
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0M12 12a4 4 0 1 0 0-8a4 4 0 0 0 0 8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            </span>
-            <span class="menu-label">Customers</span>
-          </a>
-          <a class="vendor-menu-link" href="testimonials.html" data-menu-item>
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24"><path d="M7 10h6M7 14h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M5 5h14v10a2 2 0 0 1-2 2H9l-4 3v-5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="menu-label">Reviews</span>
-          </a>
-          <a class="vendor-menu-link is-active" href="testimonials.html" data-menu-item>
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24"><path d="M12 6v6l4 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
-            </span>
-            <span class="menu-label">Testimonials</span>
-          </a>
-          <a class="vendor-menu-link" href="dashboard.html#reports" data-menu-item>
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24"><path d="M6 18V9M12 18V6M18 18v-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 20h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            </span>
-            <span class="menu-label">Reports</span>
-          </a>
-          <a class="vendor-menu-link" href="dashboard.html#settings" data-menu-item>
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
-            </span>
-            <span class="menu-label">Settings</span>
-          </a>
-          <a class="vendor-menu-link" href="login.html" data-menu-item>
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24"><path d="M15 7V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2M10 12h10M17 9l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="menu-label">Logout</span>
-          </a>
-        </nav>
-
-        <button class="sidebar-collapse" type="button" data-sidebar-toggle aria-label="Collapse sidebar">
-          <span class="menu-icon">
-            <svg viewBox="0 0 24 24"><path d="m14 7-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-          <span class="menu-label">Collapse</span>
-        </button>
-      </div>
-    </aside>
-
-    <main class="vendor-main">
-      <header class="vendor-topbar glass-panel">
-        <div class="topbar-title">
-          <button class="dashboard-menu-toggle" type="button" data-sidebar-toggle aria-label="Toggle sidebar">
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-          <div>
-            <span class="eyebrow">Voice of customer</span>
-            <h1>Testimonials</h1>
-          </div>
-        </div>
-
-        <div class="topbar-actions">
-          <label class="topbar-search">
-            <span class="search-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 1 1 0 13a6.5 6.5 0 0 1 0-13M15.2 15.2 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            </span>
-            <input type="search" placeholder="Search testimonials, products, customers" data-testimonial-search />
-          </label>
-
-          <div class="notification-wrap">
-            <button class="topbar-icon-button" type="button" data-notification-toggle aria-expanded="false" aria-label="Notifications">
-              <svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0v4l1.5 3h-15L6 13z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 18a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-              <span class="notification-dot"></span>
-            </button>
-            <div class="notification-dropdown glass-panel" data-notification-menu hidden>
-              <div class="dropdown-head">
-                <strong>Review signals</strong>
-                <span>2 updates</span>
-              </div>
-              <div class="notification-item">
-                <strong>12 new testimonials</strong>
-                <span>Most mention shipping speed and packaging.</span>
-              </div>
-              <div class="notification-item">
-                <strong>3 reviews hidden</strong>
-                <span>Marked for follow-up by moderation.</span>
-              </div>
-            </div>
-          </div>
-
-          <button class="profile-button" type="button">
-            <span class="profile-avatar">TA</span>
-            <span class="profile-copy">
-              <strong>Trisha Admin</strong>
-              <small>Vendor Admin</small>
-            </span>
-          </button>
-        </div>
-      </header>
-
-      <section class="testimonial-page-head">
-        <article class="hero-overview glass-panel">
-          <div class="hero-overview-copy">
-            <span class="eyebrow">Customer stories</span>
-            <h2>Showcase trust with polished social proof.</h2>
-            <p>Manage the reviews customers notice first, highlight your best product moments, and keep the tone of the brand premium.</p>
-          </div>
-          <div class="hero-pills">
-            <span class="hero-pill active">84 Active</span>
-            <span class="hero-pill">16 Hidden</span>
-            <span class="hero-pill">4.8 Avg Rating</span>
-          </div>
-        </article>
-
-        <article class="hero-spotlight-card glass-panel">
-          <span class="mini-label">Featured sentiment</span>
-          <strong>92%</strong>
-          <p>Customers mention product quality, premium finish, and quick delivery in positive feedback.</p>
-          <div class="hero-spotlight-meter">
-            <span>+9.2%</span>
-            <small>engagement this week</small>
-          </div>
-        </article>
-      </section>
-
-      <section class="testimonial-toolbar glass-panel">
-        <div>
-          <span class="eyebrow">Review management</span>
-          <h2>Customer testimonials grid</h2>
-        </div>
-        <div class="toolbar-badges">
-          <span class="panel-tag success">Live testimonials</span>
-          <span class="panel-tag">Updated today</span>
-        </div>
-      </section>
-
-      <section class="testimonial-grid" id="testimonialsGrid"></section>
-
-      <button class="testimonial-fab" type="button" aria-label="Add testimonial">
-        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <span>Add Testimonial</span>
+<body data-page="testimonials">
+  <div class="page-shell">
+    <header class="navbar glass-panel">
+      <button id="menuToggle" class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="sideMenu" aria-label="Open menu">
+        <span></span><span></span><span></span>
       </button>
 
-      <nav class="mobile-bottom-nav glass-panel" aria-label="Mobile navigation">
-        <button class="mobile-nav-item" type="button" data-bottom-nav>
-          <svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-5H9v5H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="mobile-nav-item" type="button" data-bottom-nav>
-          <svg viewBox="0 0 24 24"><path d="M6 7.5 12 4l6 3.5v9L12 20l-6-3.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="mobile-nav-item" type="button" data-bottom-nav>
-          <svg viewBox="0 0 24 24"><path d="M7 4h10l2 3v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="mobile-nav-item" type="button" data-bottom-nav>
-          <svg viewBox="0 0 24 24"><path d="M6 18V9M12 18V6M18 18v-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 20h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </button>
-        <button class="mobile-nav-item is-active" type="button" data-bottom-nav>
-          <svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0M12 12a4 4 0 1 0 0-8a4 4 0 0 0 0 8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </button>
-      </nav>
+      <a class="brand" href="index.html" aria-label="EMART Home">
+        <span class="brand-mark" aria-hidden="true">E</span>
+        <span>
+          <strong>EMART</strong>
+          <small>shopping with you</small>
+        </span>
+      </a>
+
+      <a class="header-cart" href="cart.html" aria-label="View cart">
+        <svg viewBox="0 0 24 24"><path d="M3 5h2l2.4 9.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L21 8H7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19" r="1.5"/><circle cx="18" cy="19" r="1.5"/></svg>
+        <span class="cart-count" data-cart-count hidden>0</span>
+      </a>
+
+      <div class="nav-panel" id="navPanel">
+        <nav class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="products.html" class="nav-link">Products</a>
+          <a href="cart.html" class="nav-link">Cart</a>
+          <a href="testimonials.html" class="nav-link active">Testimonials</a>
+          <a href="vendor-dashboard.html" class="nav-link" data-role-only="vendor" hidden>Vendor Dashboard</a>
+          <a href="admin-dashboard.html" class="nav-link" data-role-only="admin" hidden>Admin Dashboard</a>
+          <a href="add-product.html" class="nav-link" data-role-only="vendor admin" hidden>Add Product</a>
+        </nav>
+        <div class="nav-actions">
+          <a class="auth-button login-button" href="login.html" data-guest-only>Login / Admin</a>
+          <button class="auth-button signup-button" type="button" data-role-only="customer vendor admin" data-logout hidden>Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="section-block page-intro reveal">
+        <span class="eyebrow">Testimonials</span>
+        <h1>Customers shopping with EMART</h1>
+        <p>Simple storefront feedback while product management stays admin-only.</p>
+      </section>
+
+      <section class="testimonial-grid section-block">
+        <article class="testimonial-card glass-panel">
+          <div class="testimonial-card-top">
+            <div class="testimonial-user"><span class="testimonial-avatar">PS</span><div><strong>Priya S.</strong><span class="testimonial-product">Verified buyer</span></div></div>
+            <span class="status-badge active">Active</span>
+          </div>
+          <div class="testimonial-rating">★★★★★</div>
+          <p>Products were easy to find, and adding items to the cart felt quick and clear.</p>
+        </article>
+        <article class="testimonial-card glass-panel">
+          <div class="testimonial-card-top">
+            <div class="testimonial-user"><span class="testimonial-avatar">AR</span><div><strong>Arjun R.</strong><span class="testimonial-product">Verified buyer</span></div></div>
+            <span class="status-badge active">Active</span>
+          </div>
+          <div class="testimonial-rating">★★★★★</div>
+          <p>The product details page helped me compare price, stock, and discount before buying.</p>
+        </article>
+        <article class="testimonial-card glass-panel">
+          <div class="testimonial-card-top">
+            <div class="testimonial-user"><span class="testimonial-avatar">NK</span><div><strong>Nisha K.</strong><span class="testimonial-product">Verified buyer</span></div></div>
+            <span class="status-badge active">Active</span>
+          </div>
+          <div class="testimonial-rating">★★★★</div>
+          <p>The cart quantity controls are simple and the total updates exactly as expected.</p>
+        </article>
+      </section>
     </main>
   </div>
 

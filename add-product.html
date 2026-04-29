@@ -13,7 +13,7 @@
 <body data-page="add-product">
   <div class="page-shell page-shell-medium">
     <header class="navbar glass-panel">
-      <button class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="adminSidebar" aria-label="Open admin menu">
+      <button id="menuToggle" class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="sideMenu" aria-label="Open menu">
         <span></span>
         <span></span>
         <span></span>
@@ -43,15 +43,18 @@
 
       <a class="header-cart" href="cart.html" aria-label="View cart">
         <svg viewBox="0 0 24 24"><path d="M3 5h2l2.4 9.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L21 8H7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19" r="1.5"/><circle cx="18" cy="19" r="1.5"/></svg>
+        <span class="cart-count" data-cart-count hidden>0</span>
       </a>
 
       <div class="nav-panel" id="navPanel">
         <nav class="nav-links">
           <a href="index.html" class="nav-link">Home</a>
           <a href="products.html" class="nav-link">Products</a>
-          <a href="add-product.html" class="nav-link active">Add Product</a>
           <a href="cart.html" class="nav-link">Cart</a>
           <a href="testimonials.html" class="nav-link">Testimonials</a>
+          <a href="vendor-dashboard.html" class="nav-link" data-role-only="vendor" hidden>Vendor Dashboard</a>
+          <a href="admin-dashboard.html" class="nav-link" data-role-only="admin" hidden>Admin Dashboard</a>
+          <a href="add-product.html" class="nav-link active" data-role-only="vendor admin" hidden>Add Product</a>
         </nav>
 
         <form class="nav-search" action="products.html">
@@ -63,8 +66,8 @@
         </form>
 
         <div class="nav-actions">
-          <a class="auth-button login-button" href="login.html">Login</a>
-          <a class="auth-button signup-button" href="login.html">Sign Up</a>
+          <a class="auth-button login-button" href="login.html" data-guest-only>Login / Admin</a>
+          <button class="auth-button signup-button" type="button" data-role-only="customer vendor admin" data-logout hidden>Logout</button>
         </div>
       </div>
     </header>
@@ -74,46 +77,51 @@
         <div class="section-heading compact-center">
           <span class="eyebrow">Vendor form</span>
           <h1>Add a new product</h1>
-          <p>Frontend-only form UI, structured for future backend and database integration.</p>
+          <p>Saved products appear immediately on the home page, products page, details page, and dashboard.</p>
         </div>
         <form class="form-card glass-panel product-form" id="addProductForm">
           <div class="form-grid two-col">
             <label class="form-field">
               <span>Product name</span>
-              <input type="text" placeholder="Enter product name" />
+              <input type="text" name="name" placeholder="Enter product name" required />
             </label>
             <label class="form-field">
               <span>Category</span>
-              <select>
-                <option>Electronics</option>
-                <option>Fashion</option>
-                <option>Home</option>
-                <option>Beauty</option>
-                <option>Grocery</option>
+              <select name="category" required>
+                <option value="electronics">Electronics</option>
+                <option value="fashion">Fashion</option>
+                <option value="home">Home</option>
+                <option value="beauty">Beauty</option>
+                <option value="grocery">Grocery</option>
               </select>
             </label>
             <label class="form-field">
-              <span>Price</span>
-              <input type="number" placeholder="2499" />
+              <span>Price in ₹</span>
+              <input type="number" name="price" min="1" placeholder="2499" required />
             </label>
             <label class="form-field">
-              <span>Stock</span>
-              <input type="number" placeholder="48" />
+              <span>Old price in ₹</span>
+              <input type="number" name="oldPrice" min="0" placeholder="3299" />
             </label>
             <label class="form-field">
-              <span>Image URL</span>
-              <input type="text" placeholder="Paste product image URL" />
+              <span>Discount percentage</span>
+              <input type="number" name="discount" min="0" max="100" placeholder="20" />
             </label>
             <label class="form-field">
-              <span>Discount</span>
-              <input type="number" placeholder="20" />
+              <span>Stock quantity</span>
+              <input type="number" name="stock" min="0" placeholder="48" required />
+            </label>
+            <label class="form-field full-field">
+              <span>Product image URL</span>
+              <input type="url" name="image" placeholder="Paste product image URL" required />
             </label>
           </div>
           <label class="form-field">
             <span>Description</span>
-            <textarea rows="5" placeholder="Write a concise product description"></textarea>
+            <textarea rows="5" name="description" placeholder="Write a concise product description" required></textarea>
           </label>
-          <button class="primary-button form-button" type="button" data-loading-button>Save Product</button>
+          <p class="form-message" id="productFormMessage" aria-live="polite"></p>
+          <button class="primary-button form-button" type="submit">Save Product</button>
         </form>
       </section>
     </main>

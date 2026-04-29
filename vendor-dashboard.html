@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMART Vendor Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="vendor-dashboard" class="vendor-body">
+  <div class="vendor-layout">
+    <aside class="vendor-sidebar glass-panel" data-sidebar>
+      <div class="sidebar-inner">
+        <a class="vendor-brand" href="index.html"><span class="vendor-brand-mark">E</span><span class="vendor-brand-copy"><strong>EMART</strong><small>Vendor Console</small></span></a>
+        <nav class="vendor-menu">
+          <a class="vendor-menu-link is-active" href="vendor-dashboard.html" data-menu-item><span class="menu-icon">□</span><span class="menu-label">Vendor Dashboard</span></a>
+          <a class="vendor-menu-link" href="add-product.html" data-menu-item><span class="menu-icon">+</span><span class="menu-label">Add Product</span></a>
+          <a class="vendor-menu-link" href="manage-products.html" data-menu-item><span class="menu-icon">▦</span><span class="menu-label">Manage Products</span></a>
+          <a class="vendor-menu-link" href="vendor-orders.html" data-menu-item><span class="menu-icon">☰</span><span class="menu-label">Vendor Orders</span></a>
+          <button class="vendor-menu-link logout-menu-button" type="button" data-logout><span class="menu-icon">↗</span><span class="menu-label">Logout</span></button>
+        </nav>
+      </div>
+    </aside>
+    <main class="vendor-main">
+      <header class="vendor-topbar glass-panel">
+        <div class="topbar-title"><button id="menuToggle" class="dashboard-menu-toggle" type="button" aria-controls="sideMenu" aria-label="Open menu"><span></span><span></span><span></span></button><div><span class="eyebrow">Vendor workspace</span><h1>Vendor Dashboard</h1></div></div>
+        <div class="topbar-actions"><input class="topbar-search-input" type="search" placeholder="Search products" data-dashboard-search /><a class="secondary-button" href="index.html">Storefront</a><button class="logout-button" type="button" data-logout>Logout</button></div>
+      </header>
+      <section class="vendor-hero">
+        <article class="hero-overview glass-panel"><span class="eyebrow">Your store</span><h2>Manage products owned by your vendor account.</h2><p>Only real product, stock, and order data from localStorage is shown here.</p><div class="hero-pills"><a class="hero-pill active" href="add-product.html">Add Product</a><a class="hero-pill" href="manage-products.html">Manage Products</a></div></article>
+        <article class="hero-spotlight-card glass-panel"><span class="mini-label">Orders</span><strong>Local</strong><p>Vendor orders appear when customers buy products linked to your vendor email.</p></article>
+      </section>
+      <section class="vendor-stats-grid" id="dashboardStats"></section>
+      <section class="vendor-content-grid">
+        <article class="vendor-panel glass-panel"><div class="panel-head"><div><span class="eyebrow">Stock</span><h2>Low stock products</h2></div><span class="panel-tag warning">5 or fewer</span></div><div class="alert-stack" id="lowStockAlerts"></div></article>
+        <article class="vendor-panel glass-panel"><div class="panel-head"><div><span class="eyebrow">Recently added</span><h2>Latest products</h2></div></div><div class="recent-products" id="recentProducts"></div></article>
+      </section>
+      <section class="vendor-content-grid single-column">
+        <article class="vendor-panel glass-panel wide-panel"><div class="panel-head"><div><span class="eyebrow">Management</span><h2>My products</h2></div><a class="panel-link" href="add-product.html">Add Product</a></div><div class="vendor-table-wrap"><table class="vendor-table"><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead><tbody id="productsTableBody"></tbody></table></div></article>
+      </section>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

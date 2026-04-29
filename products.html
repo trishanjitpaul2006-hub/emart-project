@@ -13,7 +13,7 @@
 <body data-page="products">
   <div class="page-shell">
     <header class="navbar glass-panel">
-      <button class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="adminSidebar" aria-label="Open admin menu">
+      <button id="menuToggle" class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="sideMenu" aria-label="Open menu">
         <span></span>
         <span></span>
         <span></span>
@@ -43,6 +43,7 @@
 
       <a class="header-cart" href="cart.html" aria-label="View cart">
         <svg viewBox="0 0 24 24"><path d="M3 5h2l2.4 9.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L21 8H7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19" r="1.5"/><circle cx="18" cy="19" r="1.5"/></svg>
+        <span class="cart-count" data-cart-count hidden>0</span>
       </a>
 
       <div class="nav-panel" id="navPanel">
@@ -50,6 +51,10 @@
           <a href="index.html" class="nav-link">Home</a>
           <a href="products.html" class="nav-link active">Products</a>
           <a href="cart.html" class="nav-link">Cart</a>
+          <a href="testimonials.html" class="nav-link">Testimonials</a>
+          <a href="vendor-dashboard.html" class="nav-link" data-role-only="vendor" hidden>Vendor Dashboard</a>
+          <a href="admin-dashboard.html" class="nav-link" data-role-only="admin" hidden>Admin Dashboard</a>
+          <a href="add-product.html" class="nav-link" data-role-only="vendor admin" hidden>Add Product</a>
         </nav>
 
         <form class="nav-search" action="products.html">
@@ -63,9 +68,10 @@
         <div class="nav-actions">
           <a class="icon-button" href="cart.html" aria-label="View cart">
             <svg viewBox="0 0 24 24"><path d="M3 5h2l2.4 9.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L21 8H7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19" r="1.5"/><circle cx="18" cy="19" r="1.5"/></svg>
+            <span class="cart-count" data-cart-count hidden>0</span>
           </a>
-          <a class="auth-button login-button" href="login.html">Login</a>
-          <a class="auth-button signup-button" href="login.html">Sign Up</a>
+          <a class="auth-button login-button" href="login.html" data-guest-only>Login / Admin</a>
+          <button class="auth-button signup-button" type="button" data-role-only="customer vendor admin" data-logout hidden>Logout</button>
         </div>
       </div>
     </header>
@@ -75,7 +81,7 @@
         <div>
           <span class="eyebrow">Premium catalog</span>
           <h1>Discover better deals every day</h1>
-          <p>Glossy product cards, sharp filters, fast sorting, and clean pricing built for high-conversion shopping.</p>
+          <p>Browse products added by the admin. Your cart count updates instantly and stays after reload.</p>
         </div>
         <div class="catalog-actions">
           <button class="filter-pill active" type="button" data-quick-filter="all">All</button>
@@ -93,27 +99,8 @@
             <h2>Refine your picks</h2>
           </div>
 
-          <div class="sidebar-group">
-            <span class="sidebar-label">Category</span>
-            <div class="filter-stack" id="categoryFilters"></div>
-          </div>
-
-          <div class="sidebar-group">
-            <span class="sidebar-label">Price range</span>
-            <div class="filter-stack" id="priceFilters"></div>
-          </div>
-
-          <div class="sidebar-group">
-            <span class="sidebar-label">Rating</span>
-            <div class="filter-stack" id="ratingFilters"></div>
-          </div>
-
-          <div class="sidebar-group">
-            <span class="sidebar-label">Discount</span>
-            <div class="filter-stack" id="discountFilters"></div>
-          </div>
-
-          <button class="secondary-button sidebar-button" type="button" id="clearFilters">Reset filters</button>
+          <p class="product-subtle">Use the top category buttons and search bar to find saved products.</p>
+          <a class="primary-button sidebar-button" href="add-product.html" data-role-only="vendor admin" hidden>Add Product</a>
         </aside>
 
         <div class="catalog-main reveal">
@@ -126,10 +113,9 @@
               <label class="sort-control">
                 <span>Sort</span>
                 <select id="sortSelect" aria-label="Sort products">
-                  <option value="featured">Featured</option>
+                  <option value="newest">Newest</option>
                   <option value="price-low">Price: Low to High</option>
                   <option value="price-high">Price: High to Low</option>
-                  <option value="rating">Top Rated</option>
                   <option value="discount">Best Discount</option>
                 </select>
               </label>

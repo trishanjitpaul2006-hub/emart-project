@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMART Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body data-page="admin-dashboard" class="vendor-body">
+  <div class="vendor-layout">
+    <aside class="vendor-sidebar glass-panel">
+      <div class="sidebar-inner">
+        <a class="vendor-brand" href="index.html"><span class="vendor-brand-mark">E</span><span class="vendor-brand-copy"><strong>EMART</strong><small>Admin Console</small></span></a>
+        <nav class="vendor-menu">
+          <a class="vendor-menu-link is-active" href="admin-dashboard.html">Admin Dashboard</a>
+          <a class="vendor-menu-link" href="#vendors">Vendors</a>
+          <a class="vendor-menu-link" href="#customers">Customers</a>
+          <a class="vendor-menu-link" href="#products">Products</a>
+          <a class="vendor-menu-link" href="#orders">Orders</a>
+          <a class="vendor-menu-link" href="#settings">Settings</a>
+          <button class="vendor-menu-link logout-menu-button" type="button" data-logout>Logout</button>
+        </nav>
+      </div>
+    </aside>
+    <main class="vendor-main">
+      <header class="vendor-topbar glass-panel">
+        <div><span class="eyebrow">Admin access</span><h1>Admin Dashboard</h1></div>
+        <div class="topbar-actions"><input class="topbar-search-input" type="search" placeholder="Search dashboard" data-dashboard-search /><a class="secondary-button" href="index.html">Storefront</a><button class="logout-button" type="button" data-logout>Logout</button></div>
+      </header>
+      <section class="vendor-hero">
+        <article class="hero-overview glass-panel"><span class="eyebrow">Website control</span><h2>View all vendors, customers, products, and orders.</h2><p>Only real localStorage totals are shown for products, users, stock, and orders.</p></article>
+        <article class="hero-spotlight-card glass-panel" id="settings"><span class="mini-label">Backend ready</span><strong>Local</strong><p>Data can later move from localStorage to APIs and MySQL.</p></article>
+      </section>
+      <section class="vendor-stats-grid" id="adminStats"></section>
+      <section class="vendor-content-grid">
+        <article class="vendor-panel glass-panel" id="vendors"><div class="panel-head"><div><span class="eyebrow">Admin</span><h2>All Vendors</h2></div></div><div class="vendor-table-wrap"><table class="vendor-table"><thead><tr><th>Name</th><th>Email</th><th>Products</th></tr></thead><tbody id="vendorsTableBody"></tbody></table></div></article>
+        <article class="vendor-panel glass-panel" id="customers"><div class="panel-head"><div><span class="eyebrow">Admin</span><h2>All Customers</h2></div></div><div class="vendor-table-wrap"><table class="vendor-table"><thead><tr><th>Name</th><th>Email</th><th>Orders</th></tr></thead><tbody id="customersTableBody"></tbody></table></div></article>
+      </section>
+      <section class="vendor-content-grid single-column" id="products">
+        <article class="vendor-panel glass-panel"><div class="panel-head"><div><span class="eyebrow">Admin</span><h2>All Products</h2></div></div><div class="vendor-table-wrap"><table class="vendor-table"><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead><tbody id="adminProductsTableBody"></tbody></table></div></article>
+      </section>
+      <section class="vendor-content-grid single-column" id="orders">
+        <article class="vendor-panel glass-panel"><div class="panel-head"><div><span class="eyebrow">Admin</span><h2>All Orders</h2></div></div><div class="vendor-table-wrap"><table class="vendor-table"><thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody id="adminOrdersTableBody"></tbody></table></div></article>
+      </section>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

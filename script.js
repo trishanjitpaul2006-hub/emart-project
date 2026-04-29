@@ -1,471 +1,810 @@
+const PRODUCT_KEY = "emartProducts";
+const CART_KEY = "emartCart";
+const ORDER_KEY = "emartOrders";
+const ROLE_KEY = "emartUserRole";
+const USER_KEY = "emartCurrentUser";
+const ADMIN_PASSWORD = "admin123";
+const DEMO_CUSTOMER = { email: "customer@emart.com", password: "customer123", name: "Customer Demo" };
+const DEMO_VENDOR = { email: "vendor@emart.com", password: "vendor123", name: "Vendor Demo" };
+
 const categories = [
-  { name: "Electronics", description: "Audio, wearables, smart essentials", icon: '<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 20h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>' },
-  { name: "Fashion", description: "Modern fits and elevated basics", icon: '<svg viewBox="0 0 24 24"><path d="M8 5l4 3 4-3 2 4-3 2v8H9v-8L6 9l2-4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>' },
-  { name: "Home", description: "Glossy upgrades for every room", icon: '<svg viewBox="0 0 24 24"><path d="M4 11.5L12 5l8 6.5V19a1 1 0 0 1-1 1h-4v-5H9v5H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>' },
-  { name: "Beauty", description: "Premium daily care picks", icon: '<svg viewBox="0 0 24 24"><path d="M10 4h4v4.2l2.5 2.8A5 5 0 0 1 12.8 19h-1.6A5 5 0 0 1 7.5 11l2.5-2.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>' },
-  { name: "Grocery", description: "Fresh pantry and daily needs", icon: '<svg viewBox="0 0 24 24"><path d="M8 4c2 1 3 3 3 5c0 1.5-.7 3.1-2.1 4.4C7.3 14.9 6 16.5 6 19h12c0-3.2-1.9-5-3.3-6.3C13.6 11.7 13 10.3 13 9c0-2 1.1-4 3-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>' }
+  { name: "Electronics", description: "Audio, wearables, smart essentials", value: "electronics" },
+  { name: "Fashion", description: "Modern fits and elevated basics", value: "fashion" },
+  { name: "Home", description: "Useful upgrades for every room", value: "home" },
+  { name: "Beauty", description: "Premium daily care picks", value: "beauty" },
+  { name: "Grocery", description: "Fresh pantry and daily needs", value: "grocery" }
 ];
 
-const products = [
-  { id: 1, name: "Nova X Wireless Headphones", category: "electronics", shortCategory: "Audio", price: 3999, oldPrice: 5499, rating: 4.8, discount: 27, imageClass: "visual-electronics", imageLabel: "Spatial sound", stock: 14 },
-  { id: 2, name: "Luma Smart Watch S8", category: "electronics", shortCategory: "Wearables", price: 2499, oldPrice: 3299, rating: 4.7, discount: 24, imageClass: "visual-home", imageLabel: "Daily health", stock: 22 },
-  { id: 3, name: "Aura Knit Street Jacket", category: "fashion", shortCategory: "Outerwear", price: 1299, oldPrice: 1899, rating: 4.5, discount: 32, imageClass: "visual-fashion", imageLabel: "Limited drop", stock: 38 },
-  { id: 4, name: "FreshBox Organic Essentials", category: "grocery", shortCategory: "Pantry", price: 799, oldPrice: 1099, rating: 4.6, discount: 27, imageClass: "visual-grocery", imageLabel: "Daily fresh", stock: 12 },
-  { id: 5, name: "Halo Desk Lamp Pro", category: "home", shortCategory: "Lighting", price: 2499, oldPrice: 3199, rating: 4.4, discount: 22, imageClass: "visual-home", imageLabel: "Ambient glow", stock: 9 },
-  { id: 6, name: "PureVeil Skin Serum", category: "beauty", shortCategory: "Skincare", price: 599, oldPrice: 899, rating: 4.3, discount: 33, imageClass: "visual-beauty", imageLabel: "Glow routine", stock: 44 },
-  { id: 7, name: "StrideFlex Training Shoes", category: "fashion", shortCategory: "Footwear", price: 2999, oldPrice: 3999, rating: 4.9, discount: 25, imageClass: "visual-sports", imageLabel: "Performance fit", stock: 18 },
-  { id: 8, name: "ZenBrew Coffee Set", category: "home", shortCategory: "Kitchen", price: 1499, oldPrice: 1999, rating: 4.6, discount: 25, imageClass: "visual-luxury", imageLabel: "Morning ritual", stock: 7 }
-];
+const filterState = { quick: "all", query: "", sort: "newest" };
 
-const quickFilters = ["all", "electronics", "fashion", "home", "deal"];
-const categoryFilters = [{ label: "All", value: "all" }, { label: "Electronics", value: "electronics" }, { label: "Fashion", value: "fashion" }, { label: "Home", value: "home" }, { label: "Beauty", value: "beauty" }, { label: "Grocery", value: "grocery" }];
-const priceFilters = [{ label: "All", value: "all" }, { label: "Under \u20B91,000", value: "under-1000" }, { label: "\u20B91,000 - \u20B92,500", value: "1000-2500" }, { label: "Above \u20B92,500", value: "above-2500" }];
-const ratingFilters = [{ label: "All", value: "all" }, { label: "4.0+", value: "4" }, { label: "4.5+", value: "4.5" }, { label: "4.8+", value: "4.8" }];
-const discountFilters = [{ label: "All", value: "all" }, { label: "10%+", value: "10" }, { label: "20%+", value: "20" }, { label: "30%+", value: "30" }];
+function readStorage(key, fallback) {
+  try {
+    return JSON.parse(localStorage.getItem(key)) || fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
 
-const dashboardStats = [
-  { label: "Total Products", value: "248", change: "+12 this week", icon: '<svg viewBox="0 0 24 24"><path d="M6 7.5 12 4l6 3.5v9L12 20l-6-3.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>' },
-  { label: "Total Orders", value: "1,482", change: "+8.4% growth", icon: '<svg viewBox="0 0 24 24"><path d="M7 4h10l2 3v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>' },
-  { label: "Total Revenue", value: "\u20B94.86L", change: "+18.4% month", icon: '<svg viewBox="0 0 24 24"><path d="M12 3v18M8 7.5c0-1.5 1.8-2.5 4-2.5s4 1 4 2.5-1.8 2.5-4 2.5-4 1-4 2.5 1.8 2.5 4 2.5 4 1 4 2.5-1.8 2.5-4 2.5-4-1-4-2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>' },
-  { label: "Pending Orders", value: "36", change: "Needs review", icon: '<svg viewBox="0 0 24 24"><path d="M12 6v6l4 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>' },
-  { label: "Customers", value: "8,294", change: "+314 new users", icon: '<svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0M12 12a4 4 0 1 0 0-8a4 4 0 0 0 0 8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>' }
-];
+function writeStorage(key, value) {
+  // TODO: Replace localStorage with backend API later.
+  localStorage.setItem(key, JSON.stringify(value));
+}
 
-const salesSeries = [
-  { label: "Mon", value: 52 },
-  { label: "Tue", value: 74 },
-  { label: "Wed", value: 63 },
-  { label: "Thu", value: 88 },
-  { label: "Fri", value: 96 },
-  { label: "Sat", value: 71 },
-  { label: "Sun", value: 84 }
-];
+function getCurrentRole() {
+  return localStorage.getItem(ROLE_KEY) || "";
+}
 
-const orders = [
-  { id: "#EM-2012", customer: "Aarav D.", product: "Nova X Wireless Headphones", status: "shipped", amount: 3999 },
-  { id: "#EM-2011", customer: "Mira S.", product: "Halo Desk Lamp Pro", status: "pending", amount: 2499 },
-  { id: "#EM-2010", customer: "Rohan K.", product: "StrideFlex Training Shoes", status: "processing", amount: 2999 },
-  { id: "#EM-2009", customer: "Anika P.", product: "ZenBrew Coffee Set", status: "delivered", amount: 1499 },
-  { id: "#EM-2008", customer: "Dev M.", product: "PureVeil Skin Serum", status: "shipped", amount: 599 }
-];
+function getCurrentUser() {
+  return readStorage(USER_KEY, null);
+}
 
-const lowStockItems = [
-  { name: "ZenBrew Coffee Set", stock: 7, note: "Kitchen bundle demand increased 18%." },
-  { name: "Halo Desk Lamp Pro", stock: 9, note: "Home category sales picked up this weekend." },
-  { name: "FreshBox Organic Essentials", stock: 12, note: "Bundle reorder suggested within 2 days." }
-];
+function setSession(role, user) {
+  localStorage.setItem(ROLE_KEY, role);
+  writeStorage(USER_KEY, { role, ...user });
+}
 
-const testimonials = [
-  { name: "Priya S.", initials: "PS", product: "Nova X Wireless Headphones", review: "The finish feels premium and the sound isolation is way better than I expected. Delivery was quick too.", status: "Active", rating: 5, tone: "High audio satisfaction" },
-  { name: "Arjun R.", initials: "AR", product: "Halo Desk Lamp Pro", review: "Looks elegant on my desk and the brightness control feels premium. Packaging was secure and neat.", status: "Active", rating: 5, tone: "Design praised" },
-  { name: "Megha T.", initials: "MT", product: "PureVeil Skin Serum", review: "The texture is light and the product presentation is beautiful. Customers clearly notice the quality.", status: "Hidden", rating: 4, tone: "Awaiting recheck" },
-  { name: "Soham B.", initials: "SB", product: "StrideFlex Training Shoes", review: "Comfortable from day one and the product page matched the real item perfectly. Very happy with the purchase.", status: "Active", rating: 5, tone: "Fit and comfort win" },
-  { name: "Nisha K.", initials: "NK", product: "ZenBrew Coffee Set", review: "Bought it as a gift and it felt much more expensive than the price. Clean finish, classy box, lovely experience.", status: "Active", rating: 5, tone: "Gift-ready feedback" },
-  { name: "Rahul V.", initials: "RV", product: "Luma Smart Watch S8", review: "Battery life and display are strong for the segment. The watch looks modern and the order arrived before expected.", status: "Hidden", rating: 4, tone: "Needs moderation review" }
-];
+function requireRole(role) {
+  if (getCurrentRole() !== role) {
+    alert("Access denied");
+    window.location.href = "login.html";
+    return false;
+  }
+  return true;
+}
 
-const filterState = { quick: "all", category: "all", price: "all", rating: "all", discount: "all", query: "" };
+function requireAnyRole(roles) {
+  if (!roles.includes(getCurrentRole())) {
+    alert("Access denied");
+    window.location.href = "login.html";
+    return false;
+  }
+  return true;
+}
+
+function protectCurrentPage() {
+  const page = document.body.dataset.page;
+  const vendorPages = ["vendor-dashboard", "add-product", "manage-products", "vendor-orders", "dashboard"];
+  const adminPages = ["admin-dashboard"];
+  if (vendorPages.includes(page)) requireAnyRole(["vendor", "admin"]);
+  if (adminPages.includes(page)) requireRole("admin");
+  if (page === "cart") requireRole("customer");
+}
+
+function loginCustomer(event) {
+  if (event) event.preventDefault();
+  const email = document.getElementById("customerEmail")?.value.trim();
+  const password = document.getElementById("customerPassword")?.value;
+  const message = document.getElementById("customerLoginMessage");
+  if (email === DEMO_CUSTOMER.email && password === DEMO_CUSTOMER.password) {
+    setSession("customer", { email, name: DEMO_CUSTOMER.name });
+    showFormMessage(message, "Login successful, redirecting...", "success");
+    setTimeout(() => window.location.href = "index.html", 450);
+  } else {
+    showFormMessage(message, "Wrong email or password.", "error");
+  }
+}
+
+function loginVendor(event) {
+  if (event) event.preventDefault();
+  const email = document.getElementById("vendorEmail")?.value.trim();
+  const password = document.getElementById("vendorPassword")?.value;
+  const message = document.getElementById("vendorLoginMessage");
+  if (email === DEMO_VENDOR.email && password === DEMO_VENDOR.password) {
+    setSession("vendor", { email, name: DEMO_VENDOR.name });
+    ensureDemoVendor();
+    showFormMessage(message, "Login successful, redirecting...", "success");
+    setTimeout(() => window.location.href = "vendor-dashboard.html", 450);
+  } else {
+    showFormMessage(message, "Wrong email or password.", "error");
+  }
+}
+
+function loginAdmin(event) {
+  if (event) event.preventDefault();
+  const password = document.getElementById("adminPassword")?.value;
+  const message = document.getElementById("adminLoginMessage");
+  if (password === ADMIN_PASSWORD) {
+    setSession("admin", { email: "admin@emart.com", name: "Admin" });
+    showFormMessage(message, "Login successful, redirecting...", "success");
+    setTimeout(() => window.location.href = "admin-dashboard.html", 450);
+  } else {
+    showFormMessage(message, "Wrong password.", "error");
+  }
+}
+
+function logoutUser() {
+  localStorage.removeItem(ROLE_KEY);
+  localStorage.removeItem(USER_KEY);
+  localStorage.removeItem("emartAdminSession");
+  window.location.href = "login.html";
+}
+
+function checkAdmin() {
+  return getCurrentRole() === "admin";
+}
+
+function adminLogin(event) {
+  return loginAdmin(event);
+}
+
+function adminLogout() {
+  logoutUser();
+}
+
+function showFormMessage(node, text, type) {
+  if (!node) return;
+  node.textContent = text;
+  node.className = `form-message ${type}`;
+}
+
+function getProducts() {
+  return readStorage(PRODUCT_KEY, []);
+}
+
+function saveProducts(products) {
+  writeStorage(PRODUCT_KEY, products);
+}
+
+function getOrders() {
+  return readStorage(ORDER_KEY, []);
+}
+
+function saveOrders(orders) {
+  writeStorage(ORDER_KEY, orders);
+}
+
+function getCart() {
+  return readStorage(CART_KEY, []);
+}
+
+function saveCart(cart) {
+  writeStorage(CART_KEY, cart);
+  updateCartCount();
+}
+
+function getVisibleProductsForRole() {
+  const role = getCurrentRole();
+  const user = getCurrentUser();
+  const products = getProducts();
+  if (role === "vendor") return products.filter((product) => product.vendorEmail === user?.email);
+  return products;
+}
+
+function createProductFromForm(form) {
+  const formData = new FormData(form);
+  const editingId = form.dataset.editingId;
+  const existing = getProducts().find((item) => String(item.id) === String(editingId));
+  const currentUser = getCurrentUser();
+  return {
+    id: editingId || `prod-${Date.now()}`,
+    vendorEmail: existing?.vendorEmail || currentUser?.email || DEMO_VENDOR.email,
+    name: (formData.get("name") || "").trim(),
+    category: (formData.get("category") || "").trim().toLowerCase(),
+    price: Number(formData.get("price") || 0),
+    oldPrice: Number(formData.get("oldPrice") || 0),
+    discount: Number(formData.get("discount") || 0),
+    stock: Number(formData.get("stock") || 0),
+    image: (formData.get("image") || "").trim(),
+    description: (formData.get("description") || "").trim(),
+    createdAt: existing?.createdAt || Date.now()
+  };
+}
+
+function saveProduct(event) {
+  if (event) event.preventDefault();
+  if (!requireAnyRole(["vendor", "admin"])) return;
+  const form = document.getElementById("addProductForm");
+  const message = document.getElementById("productFormMessage");
+  if (!form) return;
+  const product = createProductFromForm(form);
+  if (!product.name || !product.category || product.price <= 0 || product.stock < 0 || !product.image || !product.description) {
+    showFormMessage(message, "Please fill all required product details.", "error");
+    return;
+  }
+  const products = getProducts();
+  const index = products.findIndex((item) => String(item.id) === String(product.id));
+  if (index >= 0) products[index] = product;
+  else products.unshift(product);
+  saveProducts(products);
+  form.reset();
+  delete form.dataset.editingId;
+  form.querySelector("button[type='submit']").textContent = "Save Product";
+  showFormMessage(message, index >= 0 ? "Product updated successfully." : "Product saved successfully.", "success");
+  renderRoleDashboards();
+}
+
+function addToCart(productId) {
+  if (getCurrentRole() !== "customer") {
+    window.location.href = "login.html?next=cart";
+    return;
+  }
+  const product = getProducts().find((item) => String(item.id) === String(productId));
+  if (!product) return;
+  const cart = getCart();
+  const existing = cart.find((item) => String(item.id) === String(productId));
+  if (existing) existing.quantity += 1;
+  else cart.push({ id: product.id, quantity: 1 });
+  saveCart(cart);
+  renderCart();
+  showToast("Added to cart");
+}
+
+function updateCartCount() {
+  const count = getCart().reduce((total, item) => total + Number(item.quantity || 0), 0);
+  document.querySelectorAll("[data-cart-count]").forEach((badge) => {
+    badge.textContent = count;
+    badge.hidden = count === 0;
+  });
+}
+
+function increaseQuantity(productId) {
+  if (!requireRole("customer")) return;
+  saveCart(getCart().map((item) => String(item.id) === String(productId) ? { ...item, quantity: item.quantity + 1 } : item));
+  renderCart();
+}
+
+function decreaseQuantity(productId) {
+  if (!requireRole("customer")) return;
+  saveCart(getCart().map((item) => String(item.id) === String(productId) ? { ...item, quantity: item.quantity - 1 } : item).filter((item) => item.quantity > 0));
+  renderCart();
+}
+
+function removeFromCart(productId) {
+  if (!requireRole("customer")) return;
+  saveCart(getCart().filter((item) => String(item.id) !== String(productId)));
+  renderCart();
+}
+
+function placeOrder() {
+  if (!requireRole("customer")) return;
+  const user = getCurrentUser();
+  const products = getProducts();
+  const items = getCart().map((cartItem) => {
+    const product = products.find((item) => String(item.id) === String(cartItem.id));
+    return product ? { productId: product.id, vendorEmail: product.vendorEmail, name: product.name, price: product.price, quantity: cartItem.quantity } : null;
+  }).filter(Boolean);
+  if (!items.length) return;
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const orders = getOrders();
+  orders.unshift({ id: `order-${Date.now()}`, customerEmail: user.email, items, total, status: "Placed", createdAt: Date.now() });
+  saveOrders(orders);
+  saveCart([]);
+  renderCart();
+  showToast("Order placed successfully");
+}
+
+function deleteProduct(productId) {
+  const role = getCurrentRole();
+  const user = getCurrentUser();
+  const product = getProducts().find((item) => String(item.id) === String(productId));
+  if (!product) return;
+  if (role !== "admin" && !(role === "vendor" && product.vendorEmail === user?.email)) {
+    alert("Access denied");
+    return;
+  }
+  saveProducts(getProducts().filter((item) => String(item.id) !== String(productId)));
+  saveCart(getCart().filter((item) => String(item.id) !== String(productId)));
+  renderProducts();
+  renderRoleDashboards();
+  showToast("Product deleted");
+}
+
+function editProduct(productId) {
+  const role = getCurrentRole();
+  const user = getCurrentUser();
+  const product = getProducts().find((item) => String(item.id) === String(productId));
+  if (!product) return;
+  if (role !== "admin" && !(role === "vendor" && product.vendorEmail === user?.email)) {
+    alert("Access denied");
+    return;
+  }
+  const form = document.getElementById("addProductForm");
+  if (!form) {
+    window.location.href = `add-product.html?edit=${encodeURIComponent(productId)}`;
+    return;
+  }
+  form.dataset.editingId = product.id;
+  form.elements.name.value = product.name;
+  form.elements.category.value = product.category;
+  form.elements.price.value = product.price;
+  form.elements.oldPrice.value = product.oldPrice;
+  form.elements.discount.value = product.discount;
+  form.elements.stock.value = product.stock;
+  form.elements.image.value = product.image;
+  form.elements.description.value = product.description;
+  form.querySelector("button[type='submit']").textContent = "Update Product";
+  form.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 
 function formatRupees(value) {
-  return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(value);
+  return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
-function createCategoryMarkup(category) {
-  return `<article class="category-card"><div class="category-icon">${category.icon}</div><div><h3>${category.name}</h3><p>${category.description}</p></div></article>`;
+function escapeHtml(value) {
+  return String(value || "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
 }
 
-function createProductMarkup(product) {
-  return `<article class="product-card"><div class="product-visual ${product.imageClass}"><span class="visual-label">${product.imageLabel}</span></div><div><h3>${product.name}</h3><p class="product-subtle">${product.shortCategory}</p><div class="product-meta"><span class="rating-pill">${product.rating} \u2605</span><span class="discount-tag">${product.discount}% OFF</span></div><div class="price-row"><span class="price-badge">${formatRupees(product.price)}</span><span class="old-price">${formatRupees(product.oldPrice)}</span></div><div class="product-bottom"><span class="product-subtle">Fast delivery available</span><button class="action-button" type="button" data-loading-button>Add to Cart</button></div></div></article>`;
+function productImage(product) {
+  return escapeHtml(product.image || "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=900&q=80");
 }
 
-function createDealMarkup(product) {
-  return `<article class="deal-card"><div class="deal-visual ${product.imageClass}"><span class="visual-label">${product.imageLabel}</span></div><div><span class="deal-tag">Deal of the day</span><h3>${product.name}</h3><p>Save big on a polished everyday essential with premium styling and standout value.</p><div class="price-row"><span class="price-badge">${formatRupees(product.price)}</span><span class="old-price">${formatRupees(product.oldPrice)}</span><span class="discount-tag">${product.discount}% OFF</span></div><div class="deal-bottom"><span class="product-subtle">Highly rated pick</span><button class="action-button" type="button" data-loading-button>Grab Deal</button></div></div></article>`;
+function categoryLabel(value) {
+  const match = categories.find((item) => item.value === value);
+  return match ? match.name : value ? value.charAt(0).toUpperCase() + value.slice(1) : "General";
 }
 
-function createFilterButtons(items, type, activeValue) {
-  return items.map((item) => `<button class="filter-option${item.value === activeValue ? " active" : ""}" type="button" data-filter-type="${type}" data-filter-value="${item.value}">${item.label}</button>`).join("");
+function productCard(product) {
+  const description = product.description || "";
+  return `<article class="product-card real-product-card">
+    <a class="product-visual product-image-card" href="product-details.html?id=${encodeURIComponent(product.id)}">
+      <img src="${productImage(product)}" alt="${escapeHtml(product.name)}" loading="lazy" />
+      ${product.discount ? `<span class="discount-tag">${product.discount}% OFF</span>` : ""}
+    </a>
+    <div class="product-card-body">
+      <span class="product-subtle">${escapeHtml(categoryLabel(product.category))}</span>
+      <h3>${escapeHtml(product.name)}</h3>
+      <p>${escapeHtml(description).slice(0, 92)}${description.length > 92 ? "..." : ""}</p>
+      <div class="price-row"><span class="price-badge">${formatRupees(product.price)}</span>${product.oldPrice ? `<span class="old-price">${formatRupees(product.oldPrice)}</span>` : ""}</div>
+      <div class="product-bottom">
+        <button class="action-button" type="button" data-add-cart="${escapeHtml(product.id)}">Add to Cart</button>
+        <a class="secondary-button compact-button" href="product-details.html?id=${encodeURIComponent(product.id)}">View Details</a>
+      </div>
+    </div>
+  </article>`;
+}
+
+function emptyProductsMarkup() {
+  return `<article class="empty-state glass-panel"><span class="eyebrow">No products</span><h3>No products added yet.</h3>${["vendor", "admin"].includes(getCurrentRole()) ? '<a class="primary-button" href="add-product.html">Add Product</a>' : ""}</article>`;
+}
+
+function renderProducts(hostId, productsToRender = getProducts()) {
+  const host = document.getElementById(hostId || "allProducts");
+  if (!host) return;
+  host.innerHTML = productsToRender.length ? productsToRender.map(productCard).join("") : emptyProductsMarkup();
+}
+
+function renderCategoryRow() {
+  const host = document.getElementById("categoryRow");
+  if (!host) return;
+  host.innerHTML = categories.map((category) => `<article class="category-card" data-category-card="${category.value}"><div class="category-icon">${category.name.charAt(0)}</div><div><h3>${category.name}</h3><p>${category.description}</p></div></article>`).join("");
+}
+
+function applyProductFilters() {
+  const query = filterState.query.toLowerCase();
+  let filtered = getProducts().filter((product) => {
+    const queryMatch = !query || [product.name, product.category, product.description].some((value) => String(value).toLowerCase().includes(query));
+    const quickMatch = filterState.quick === "all" || (filterState.quick === "deal" ? Number(product.discount) > 0 : product.category === filterState.quick);
+    return queryMatch && quickMatch;
+  });
+  if (filterState.sort === "price-low") filtered.sort((a, b) => a.price - b.price);
+  if (filterState.sort === "price-high") filtered.sort((a, b) => b.price - a.price);
+  if (filterState.sort === "discount") filtered.sort((a, b) => b.discount - a.discount);
+  if (filterState.sort === "newest") filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  return filtered;
+}
+
+function updateProductPage() {
+  const filtered = applyProductFilters();
+  renderProducts("allProducts", filtered);
+  const productCount = document.getElementById("productCount");
+  const catalogHeading = document.getElementById("catalogHeading");
+  if (productCount) productCount.textContent = `${filtered.length} item${filtered.length === 1 ? "" : "s"}`;
+  if (catalogHeading) catalogHeading.textContent = filterState.query ? `Search results for "${filterState.query}"` : "All products";
 }
 
 function renderHomePage() {
-  const categoryRow = document.getElementById("categoryRow");
-  const featuredProducts = document.getElementById("featuredProducts");
-  const bestDeals = document.getElementById("bestDeals");
-  if (categoryRow) categoryRow.innerHTML = categories.map(createCategoryMarkup).join("");
-  if (featuredProducts) featuredProducts.innerHTML = products.slice(0, 4).map(createProductMarkup).join("");
-  if (bestDeals) bestDeals.innerHTML = [...products].sort((a, b) => b.discount - a.discount).slice(0, 3).map(createDealMarkup).join("");
-}
-
-function productMatchesFilters(product) {
-  const queryMatch = !filterState.query || [product.name, product.shortCategory, product.category].some((value) => value.toLowerCase().includes(filterState.query));
-  const quickMatch = filterState.quick === "all" || (filterState.quick === "deal" ? product.discount >= 25 : product.category === filterState.quick);
-  const categoryMatch = filterState.category === "all" || product.category === filterState.category;
-  const priceMatch = filterState.price === "all" || (filterState.price === "under-1000" && product.price < 1000) || (filterState.price === "1000-2500" && product.price >= 1000 && product.price <= 2500) || (filterState.price === "above-2500" && product.price > 2500);
-  const ratingMatch = filterState.rating === "all" || product.rating >= Number(filterState.rating);
-  const discountMatch = filterState.discount === "all" || product.discount >= Number(filterState.discount);
-  return queryMatch && quickMatch && categoryMatch && priceMatch && ratingMatch && discountMatch;
-}
-
-function updateCatalog(productsToRender, label) {
-  const productGrid = document.getElementById("allProducts");
-  const productCount = document.getElementById("productCount");
-  const catalogHeading = document.getElementById("catalogHeading");
-  if (!productGrid) return;
-  productGrid.innerHTML = productsToRender.length ? productsToRender.map(createProductMarkup).join("") : '<article class="empty-state glass-panel"><div><span class="eyebrow">No match</span><h3>No products found</h3><p>Try a broader search or reset the filters for more results.</p></div></article>';
-  if (productCount) productCount.textContent = `${productsToRender.length} item${productsToRender.length === 1 ? "" : "s"}`;
-  if (catalogHeading) catalogHeading.textContent = label;
-}
-
-function getCatalogLabel() {
-  if (filterState.query) return `Search results for "${filterState.query}"`;
-  if (filterState.quick === "deal") return "Best deals";
-  if (filterState.quick !== "all") return `${filterState.quick.charAt(0).toUpperCase()}${filterState.quick.slice(1)} picks`;
-  if (filterState.category !== "all") return `${filterState.category.charAt(0).toUpperCase()}${filterState.category.slice(1)} products`;
-  return "All products";
-}
-
-function renderFilterGroups() {
-  const groups = [
-    ["categoryFilters", categoryFilters, "category", filterState.category],
-    ["priceFilters", priceFilters, "price", filterState.price],
-    ["ratingFilters", ratingFilters, "rating", filterState.rating],
-    ["discountFilters", discountFilters, "discount", filterState.discount]
-  ];
-  groups.forEach(([id, items, type, value]) => {
-    const host = document.getElementById(id);
-    if (host) host.innerHTML = createFilterButtons(items, type, value);
-  });
-}
-
-function syncQuickFilters() {
-  document.querySelectorAll("[data-quick-filter]").forEach((button) => button.classList.toggle("active", button.dataset.quickFilter === filterState.quick));
-}
-
-function refreshCatalog() {
-  updateCatalog(products.filter(productMatchesFilters), getCatalogLabel());
-  renderFilterGroups();
-  syncQuickFilters();
-  attachLoadingButtons();
-}
-
-function attachFilterListeners() {
-  document.addEventListener("click", (event) => {
-    const quickButton = event.target.closest("[data-quick-filter]");
-    if (quickButton) {
-      filterState.quick = quickButton.dataset.quickFilter;
-      refreshCatalog();
-      return;
-    }
-    const filterButton = event.target.closest("[data-filter-type]");
-    if (filterButton) {
-      filterState[filterButton.dataset.filterType] = filterButton.dataset.filterValue;
-      refreshCatalog();
-    }
-  });
-
-  const clearFilters = document.getElementById("clearFilters");
-  if (clearFilters) {
-    clearFilters.addEventListener("click", () => {
-      Object.assign(filterState, { quick: "all", category: "all", price: "all", rating: "all", discount: "all", query: "" });
-      const searchInput = document.querySelector('.nav-search input[name="q"]');
-      if (searchInput) searchInput.value = "";
-      refreshCatalog();
-    });
-  }
+  const products = getProducts();
+  renderCategoryRow();
+  renderProducts("featuredProducts", products.slice(0, 4));
+  renderProducts("bestDeals", [...products].filter((item) => Number(item.discount) > 0).sort((a, b) => b.discount - a.discount).slice(0, 3));
+  const stat = document.getElementById("homeProductCount");
+  if (stat) stat.textContent = products.length;
 }
 
 function renderProductsPage() {
-  renderFilterGroups();
-  attachFilterListeners();
   const params = new URLSearchParams(window.location.search);
-  const query = params.get("q");
-  const deal = params.get("deal");
-  if (query) {
-    filterState.query = query.trim().toLowerCase();
-    const searchInput = document.querySelector('.nav-search input[name="q"]');
-    if (searchInput) searchInput.value = query;
+  filterState.query = (params.get("q") || "").trim();
+  filterState.quick = params.get("deal") === "top" ? "deal" : "all";
+  const search = document.querySelector('.nav-search input[name="q"]');
+  if (search) search.value = filterState.query;
+  document.querySelectorAll("[data-quick-filter]").forEach((button) => button.classList.toggle("active", button.dataset.quickFilter === filterState.quick));
+  updateProductPage();
+}
+
+function renderProductDetails() {
+  const host = document.getElementById("productDetails");
+  if (!host) return;
+  const id = new URLSearchParams(window.location.search).get("id");
+  const product = getProducts().find((item) => String(item.id) === String(id));
+  if (!product) {
+    host.innerHTML = `<article class="empty-state glass-panel"><h1>Product not found</h1><p>This product may have been removed.</p><a class="primary-button" href="products.html">Back to Products</a></article>`;
+    return;
   }
-  if (deal === "top") filterState.quick = "deal";
-  refreshCatalog();
+  host.innerHTML = `<div class="detail-image glass-panel"><img src="${productImage(product)}" alt="${escapeHtml(product.name)}" /></div>
+    <article class="detail-copy glass-panel">
+      <span class="eyebrow">${escapeHtml(categoryLabel(product.category))}</span>
+      <h1>${escapeHtml(product.name)}</h1>
+      <p>${escapeHtml(product.description)}</p>
+      <div class="price-row"><span class="price-badge">${formatRupees(product.price)}</span>${product.oldPrice ? `<span class="old-price">${formatRupees(product.oldPrice)}</span>` : ""}${product.discount ? `<span class="discount-tag">${product.discount}% OFF</span>` : ""}</div>
+      <p class="product-subtle">${Number(product.stock) > 0 ? `${product.stock} in stock` : "Out of stock"}</p>
+      <div class="hero-actions"><button class="primary-button" type="button" data-add-cart="${escapeHtml(product.id)}">Add to Cart</button><a class="secondary-button" href="products.html">Back to Products</a></div>
+    </article>`;
 }
 
-function attachLoadingButtons() {
-  document.querySelectorAll("[data-loading-button]").forEach((button) => {
-    if (button.dataset.bound === "true") return;
-    button.dataset.bound = "true";
-    button.addEventListener("click", () => {
-      const originalText = button.textContent;
-      button.disabled = true;
-      button.textContent = "Added";
-      setTimeout(() => {
-        button.disabled = false;
-        button.textContent = originalText;
-      }, 900);
-    });
+function renderCart() {
+  const itemsHost = document.getElementById("cartItems");
+  const summaryHost = document.getElementById("cartSummary");
+  if (!itemsHost || !summaryHost) return;
+  const cartItems = getCart().map((cartItem) => {
+    const product = getProducts().find((item) => String(item.id) === String(cartItem.id));
+    return product ? { ...product, quantity: cartItem.quantity } : null;
+  }).filter(Boolean);
+  if (!cartItems.length) {
+    itemsHost.innerHTML = `<article class="empty-state"><h2>Your cart is empty</h2><p>Add products from the catalog to see them here.</p><a class="primary-button" href="products.html">Shop Products</a></article>`;
+    summaryHost.innerHTML = `<h2>Cart total</h2><p class="product-subtle">No items selected.</p><strong class="cart-total">${formatRupees(0)}</strong>`;
+    return;
+  }
+  itemsHost.innerHTML = cartItems.map((item) => `<article class="cart-row">
+    <img src="${productImage(item)}" alt="${escapeHtml(item.name)}" />
+    <div><h3>${escapeHtml(item.name)}</h3><span class="product-subtle">${escapeHtml(categoryLabel(item.category))}</span><strong>${formatRupees(item.price)}</strong></div>
+    <div class="quantity-control"><button type="button" data-decrease="${escapeHtml(item.id)}">-</button><span>${item.quantity}</span><button type="button" data-increase="${escapeHtml(item.id)}">+</button></div>
+    <button class="ghost-button" type="button" data-remove-cart="${escapeHtml(item.id)}">Remove</button>
+  </article>`).join("");
+  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  summaryHost.innerHTML = `<span class="eyebrow">Order summary</span><h2>Cart total</h2><div class="summary-line"><span>Items</span><strong>${cartItems.reduce((sum, item) => sum + item.quantity, 0)}</strong></div><div class="summary-line"><span>Total</span><strong>${formatRupees(total)}</strong></div><button class="primary-button checkout-button" type="button" data-place-order>Checkout</button><p class="form-message" id="orderMessage"></p>`;
+}
+
+function dashboardMetric(label, value, note) {
+  return `<article class="metric-card"><div class="metric-top"><span class="metric-label">${label}</span></div><strong>${value}</strong><div class="metric-change">${note}</div></article>`;
+}
+
+function productRows(products, allowActions = true) {
+  return products.map((product) => `<tr data-search-row>
+    <td><img class="table-product-image" src="${productImage(product)}" alt="${escapeHtml(product.name)}" /></td>
+    <td>${escapeHtml(product.name)}</td>
+    <td>${escapeHtml(categoryLabel(product.category))}</td>
+    <td>${formatRupees(product.price)}</td>
+    <td>${product.stock}</td>
+    ${allowActions ? `<td><button class="ghost-button compact-button" type="button" data-edit-product="${escapeHtml(product.id)}">Edit</button><button class="danger-button compact-button" type="button" data-delete-product="${escapeHtml(product.id)}">Delete</button></td>` : ""}
+  </tr>`).join("") || `<tr><td colspan="${allowActions ? 6 : 5}">No products added yet.</td></tr>`;
+}
+
+function orderRows(orders) {
+  return orders.map((order) => `<tr data-search-row><td>${escapeHtml(order.id)}</td><td>${escapeHtml(order.customerEmail)}</td><td>${order.items.map((item) => escapeHtml(item.name)).join(", ")}</td><td>${formatRupees(order.total)}</td><td>${escapeHtml(order.status)}</td></tr>`).join("") || `<tr><td colspan="5">No orders yet.</td></tr>`;
+}
+
+function renderVendorDashboard() {
+  const user = getCurrentUser();
+  const products = getVisibleProductsForRole();
+  const orders = getOrders().filter((order) => order.items.some((item) => item.vendorEmail === user?.email));
+  const stock = products.reduce((sum, product) => sum + Number(product.stock || 0), 0);
+  const lowStock = products.filter((product) => Number(product.stock) <= 5);
+  const stats = document.getElementById("dashboardStats");
+  if (stats) stats.innerHTML = [dashboardMetric("My Products", products.length, "Vendor catalog"), dashboardMetric("Total Stock", stock, "Available units"), dashboardMetric("Vendor Orders", orders.length, "Orders with your products")].join("");
+  const lowHost = document.getElementById("lowStockAlerts");
+  if (lowHost) lowHost.innerHTML = lowStock.length ? lowStock.map((product) => `<article class="alert-item"><strong>${escapeHtml(product.name)}</strong><p>${product.stock} units left.</p></article>`).join("") : `<article class="empty-state"><p>No low stock products.</p></article>`;
+  const recentHost = document.getElementById("recentProducts");
+  if (recentHost) recentHost.innerHTML = products.slice(0, 4).map((product) => `<article class="recent-product"><img src="${productImage(product)}" alt="${escapeHtml(product.name)}" /><div><strong>${escapeHtml(product.name)}</strong><span>${formatRupees(product.price)} | ${product.stock} stock</span></div></article>`).join("") || `<article class="empty-state"><p>No products added yet.</p><a class="primary-button" href="add-product.html">Add Product</a></article>`;
+  const table = document.getElementById("productsTableBody");
+  if (table) table.innerHTML = productRows(products);
+  const orderTable = document.getElementById("vendorOrdersBody");
+  if (orderTable) orderTable.innerHTML = orderRows(orders);
+}
+
+function renderAdminDashboard() {
+  const products = getProducts();
+  const orders = getOrders();
+  const vendors = [{ email: DEMO_VENDOR.email, name: DEMO_VENDOR.name }];
+  const customers = [{ email: DEMO_CUSTOMER.email, name: DEMO_CUSTOMER.name }];
+  const stats = document.getElementById("adminStats");
+  if (stats) stats.innerHTML = [dashboardMetric("Total Products", products.length, "All vendors"), dashboardMetric("Total Vendors", vendors.length, "Demo vendors"), dashboardMetric("Total Customers", customers.length, "Demo customers"), dashboardMetric("Total Orders", orders.length, "Placed orders")].join("");
+  const vendorsBody = document.getElementById("vendorsTableBody");
+  if (vendorsBody) vendorsBody.innerHTML = vendors.map((vendor) => `<tr><td>${vendor.name}</td><td>${vendor.email}</td><td>${products.filter((item) => item.vendorEmail === vendor.email).length}</td></tr>`).join("");
+  const customersBody = document.getElementById("customersTableBody");
+  if (customersBody) customersBody.innerHTML = customers.map((customer) => `<tr><td>${customer.name}</td><td>${customer.email}</td><td>${orders.filter((item) => item.customerEmail === customer.email).length}</td></tr>`).join("");
+  const productsBody = document.getElementById("adminProductsTableBody");
+  if (productsBody) productsBody.innerHTML = productRows(products);
+  const ordersBody = document.getElementById("adminOrdersTableBody");
+  if (ordersBody) ordersBody.innerHTML = orderRows(orders);
+}
+
+function renderRoleDashboards() {
+  renderVendorDashboard();
+  renderAdminDashboard();
+  renderManageProducts();
+  renderVendorOrders();
+}
+
+function renderManageProducts() {
+  const body = document.getElementById("manageProductsBody");
+  if (body) body.innerHTML = productRows(getVisibleProductsForRole());
+}
+
+function renderVendorOrders() {
+  const user = getCurrentUser();
+  const body = document.getElementById("vendorOrdersBody");
+  if (body) body.innerHTML = orderRows(getOrders().filter((order) => order.items.some((item) => item.vendorEmail === user?.email)));
+}
+
+function showToast(message) {
+  let toast = document.querySelector(".toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.className = "toast";
+    document.body.append(toast);
+  }
+  toast.textContent = message;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 1600);
+}
+
+function updateNavbarByRole() {
+  const role = getCurrentRole();
+  document.body.dataset.role = role || "guest";
+  document.querySelectorAll("[data-role-only]").forEach((element) => {
+    element.hidden = !element.dataset.roleOnly.split(" ").includes(role);
+  });
+  document.querySelectorAll("[data-guest-only]").forEach((element) => {
+    element.hidden = Boolean(role);
+  });
+  document.querySelectorAll("[data-admin-only]").forEach((element) => {
+    element.hidden = role !== "admin";
   });
 }
 
-function attachAdminSidebar() {
-  const toggle = document.querySelector(".mobile-nav-toggle");
-  if (!toggle || document.querySelector(".vendor-layout")) return;
-
-  const currentPage = window.location.pathname.split("/").pop() || "index.html";
-  const menuItems = [
-    { label: "Dashboard", href: "dashboard.html", match: ["dashboard.html"] },
-    { label: "Product Management", href: "products.html", match: ["products.html"] },
-    { label: "Add Product", href: "add-product.html", match: ["add-product.html"] },
-    { label: "Orders", href: "dashboard.html#recent-orders", match: [] },
-    { label: "Customers", href: "dashboard.html#customers", match: [] },
-    { label: "Categories", href: "dashboard.html#categories", match: [] },
-    { label: "Reviews", href: "testimonials.html", match: [] },
-    { label: "Testimonials", href: "testimonials.html", match: ["testimonials.html"] },
-    { label: "Reports", href: "dashboard.html#reports", match: [] },
-    { label: "Settings", href: "dashboard.html#settings", match: [] },
-    { label: "Logout", href: "login.html", match: [] }
+function getRoleMenuItems() {
+  const role = getCurrentRole();
+  if (role === "customer") {
+    return [
+      ["Home", "index.html"],
+      ["Products", "products.html"],
+      ["Cart", "cart.html"],
+      ["Testimonials", "testimonials.html"],
+      ["Logout", "#logout"]
+    ];
+  }
+  if (role === "vendor") {
+    return [
+      ["Vendor Dashboard", "vendor-dashboard.html"],
+      ["Add Product", "add-product.html"],
+      ["Manage Products", "manage-products.html"],
+      ["Vendor Orders", "vendor-orders.html"],
+      ["Logout", "#logout"]
+    ];
+  }
+  if (role === "admin") {
+    return [
+      ["Admin Dashboard", "admin-dashboard.html"],
+      ["Vendors", "admin-dashboard.html#vendors"],
+      ["Customers", "admin-dashboard.html#customers"],
+      ["Products", "admin-dashboard.html#products"],
+      ["Orders", "admin-dashboard.html#orders"],
+      ["Settings", "admin-dashboard.html#settings"],
+      ["Logout", "#logout"]
+    ];
+  }
+  return [
+    ["Home", "index.html"],
+    ["Products", "products.html"],
+    ["Login", "login.html"]
   ];
-
-  const overlay = document.createElement("div");
-  overlay.className = "admin-sidebar-overlay";
-  overlay.hidden = true;
-
-  const sidebar = document.createElement("aside");
-  sidebar.className = "admin-sidebar";
-  sidebar.id = "adminSidebar";
-  sidebar.setAttribute("aria-label", "Dashboard menu");
-  sidebar.setAttribute("aria-hidden", "true");
-  sidebar.innerHTML = `
-    <div class="admin-sidebar-head">
-      <a class="admin-sidebar-brand" href="index.html" aria-label="EMART Home">
-        <span class="admin-brand-mark" aria-hidden="true">E</span>
-        <span><strong>EMART</strong><small>Admin menu</small></span>
-      </a>
-      <button class="admin-sidebar-close" type="button" aria-label="Close admin menu">
-        <span></span><span></span>
-      </button>
-    </div>
-    <nav class="admin-sidebar-nav">
-      ${menuItems.map((item) => `<a class="admin-sidebar-link${item.match.includes(currentPage) ? " is-active" : ""}" href="${item.href}">${item.label}</a>`).join("")}
-    </nav>
-  `;
-
-  document.body.append(overlay, sidebar);
-  const closeButton = sidebar.querySelector(".admin-sidebar-close");
-  const links = sidebar.querySelectorAll("a");
-
-  const setOpen = (open) => {
-    document.body.classList.toggle("admin-sidebar-open", open);
-    toggle.setAttribute("aria-expanded", String(open));
-    sidebar.setAttribute("aria-hidden", String(!open));
-    overlay.hidden = !open;
-  };
-
-  toggle.addEventListener("click", () => {
-    setOpen(!document.body.classList.contains("admin-sidebar-open"));
-  });
-  closeButton.addEventListener("click", () => setOpen(false));
-  overlay.addEventListener("click", () => setOpen(false));
-  links.forEach((link) => link.addEventListener("click", () => setOpen(false)));
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") setOpen(false);
-  });
 }
 
-function renderDashboardStats() {
-  const host = document.getElementById("dashboardStats");
-  if (!host) return;
-  host.innerHTML = dashboardStats.map((item) => `<article class="metric-card"><div class="metric-top"><span class="metric-label">${item.label}</span><span class="metric-icon">${item.icon}</span></div><strong>${item.value}</strong><div class="metric-change">${item.change}</div></article>`).join("");
+function ensureHamburgerMenu() {
+  let menuToggle = document.getElementById("menuToggle");
+  if (!menuToggle) {
+    menuToggle = document.querySelector(".mobile-nav-toggle, .dashboard-menu-toggle");
+    if (menuToggle) menuToggle.id = "menuToggle";
+  }
+  if (!menuToggle) {
+    menuToggle = document.createElement("button");
+    menuToggle.id = "menuToggle";
+    menuToggle.className = "mobile-nav-toggle floating-menu-toggle";
+    menuToggle.type = "button";
+    document.body.prepend(menuToggle);
+  }
+  menuToggle.type = "button";
+  menuToggle.setAttribute("aria-label", "Open menu");
+  menuToggle.setAttribute("aria-controls", "sideMenu");
+  menuToggle.innerHTML = "<span></span><span></span><span></span>";
+
+  let sideMenu = document.getElementById("sideMenu");
+  if (!sideMenu) {
+    sideMenu = document.createElement("aside");
+    sideMenu.id = "sideMenu";
+    document.body.append(sideMenu);
+  }
+
+  let menuOverlay = document.getElementById("menuOverlay");
+  if (!menuOverlay) {
+    menuOverlay = document.createElement("div");
+    menuOverlay.id = "menuOverlay";
+    document.body.append(menuOverlay);
+  }
+
+  sideMenu.innerHTML = `<div class="side-menu-head"><a class="vendor-brand" href="index.html"><span class="vendor-brand-mark">E</span><span class="vendor-brand-copy"><strong>EMART</strong><small>${getCurrentRole() || "Guest"} menu</small></span></a><button id="closeMenu" type="button" aria-label="Close menu">×</button></div><nav class="side-menu-nav">${getRoleMenuItems().map(([label, href]) => `<a href="${href}" ${href === "#logout" ? "data-logout" : ""}>${label}</a>`).join("")}</nav>`;
 }
 
-function renderSalesChart() {
-  const host = document.getElementById("salesChart");
-  if (!host) return;
-  host.innerHTML = salesSeries.map((item) => `<div class="chart-bar-group"><div class="chart-bar" style="height:${item.value * 2}px"></div><span class="chart-label">${item.label}</span></div>`).join("");
-}
+function attachHamburgerMenu() {
+  const bindMenu = () => {
+    ensureHamburgerMenu();
+    const menuToggle = document.getElementById("menuToggle");
+    const sideMenu = document.getElementById("sideMenu");
+    const closeMenu = document.getElementById("closeMenu");
+    const menuOverlay = document.getElementById("menuOverlay");
+    if (menuToggle?.dataset.menuBound === "true") return;
+    if (menuToggle) menuToggle.dataset.menuBound = "true";
 
-function renderLowStockAlerts() {
-  const host = document.getElementById("lowStockAlerts");
-  if (!host) return;
-  host.innerHTML = lowStockItems.map((item) => `<article class="alert-item"><strong>${item.name}</strong><p>${item.note}</p><div class="alert-meta"><span>${item.stock} units left</span><span>Restock soon</span></div></article>`).join("");
-}
-
-function orderRowMarkup(order) {
-  return `<tr data-search-row><td>${order.id}</td><td>${order.customer}</td><td>${order.product}</td><td><span class="table-status ${order.status}">${order.status}</span></td><td>${formatRupees(order.amount)}</td></tr>`;
-}
-
-function productRowMarkup(product) {
-  return `<tr data-search-row><td>${product.name}</td><td>${product.shortCategory}</td><td>${product.stock}</td><td>${formatRupees(product.price)}</td><td>${product.rating} \u2605</td></tr>`;
-}
-
-function testimonialPreviewMarkup(item) {
-  return `<article class="testimonial-preview-card"><div class="testimonial-card-top"><div class="testimonial-user"><span class="testimonial-avatar">${item.initials}</span><div><strong>${item.name}</strong><span class="testimonial-product">${item.product}</span></div></div><span class="status-badge ${item.status.toLowerCase()}">${item.status}</span></div><div class="testimonial-meta"><span class="testimonial-rating">${"\u2605".repeat(item.rating)}</span><span class="testimonial-product">${item.tone}</span></div><p>${item.review}</p></article>`;
-}
-
-function renderTestimonialSummary() {
-  const host = document.getElementById("testimonialSummary");
-  if (!host) return;
-  const activeCount = testimonials.filter((item) => item.status === "Active").length;
-  const averageRating = (testimonials.reduce((total, item) => total + item.rating, 0) / testimonials.length).toFixed(1);
-  const hiddenCount = testimonials.length - activeCount;
-  host.innerHTML = [
-    { label: "Active testimonials", value: activeCount, change: "+12 this week" },
-    { label: "Average rating", value: averageRating, change: "Verified buyers" },
-    { label: "Needs review", value: hiddenCount, change: "Moderation queue" }
-  ].map((item) => `<article class="testimonial-summary-card"><span>${item.label}</span><strong>${item.value}</strong><small>${item.change}</small></article>`).join("");
-}
-
-function renderDashboardTables() {
-  const ordersHost = document.getElementById("ordersTableBody");
-  const productsHost = document.getElementById("productsTableBody");
-  const previewHost = document.getElementById("testimonialPreview");
-  if (ordersHost) ordersHost.innerHTML = orders.map(orderRowMarkup).join("");
-  if (productsHost) productsHost.innerHTML = products.map(productRowMarkup).join("");
-  if (previewHost) previewHost.innerHTML = testimonials.filter((item) => item.status === "Active").slice(0, 4).map(testimonialPreviewMarkup).join("");
-}
-
-function renderTestimonialsPage(items = testimonials) {
-  const host = document.getElementById("testimonialsGrid");
-  if (!host) return;
-  host.innerHTML = items.map((item) => `<article class="testimonial-card"><div class="testimonial-card-top"><div class="testimonial-user"><span class="testimonial-avatar">${item.initials}</span><div><strong>${item.name}</strong><span class="testimonial-product">${item.product}</span></div></div><span class="status-badge ${item.status.toLowerCase()}">${item.status}</span></div><div class="testimonial-meta"><span class="testimonial-rating">${"\u2605".repeat(item.rating)}</span><span class="testimonial-product">${item.tone}</span></div><p>${item.review}</p><div class="testimonial-card-footer"><span class="panel-link">Customer review</span><span class="testimonial-product">Verified buyer</span></div></article>`).join("");
-}
-
-function attachSidebarToggle() {
-  const layout = document.querySelector(".vendor-layout");
-  const sidebar = document.querySelector("[data-sidebar]");
-  const toggles = document.querySelectorAll("[data-sidebar-toggle]");
-  if (!layout || !sidebar || !toggles.length) return;
-
-  const isMobileSidebar = () => window.matchMedia("(max-width: 759px)").matches;
-  const syncToggleState = () => {
-    const expanded = isMobileSidebar() ? layout.classList.contains("sidebar-open") : !layout.classList.contains("sidebar-collapsed");
-    toggles.forEach((button) => button.setAttribute("aria-expanded", String(expanded)));
-  };
-
-  toggles.forEach((toggle) => {
-    toggle.addEventListener("click", (event) => {
-      event.stopPropagation();
-      if (isMobileSidebar()) {
-        layout.classList.toggle("sidebar-open");
-      } else {
-        sidebar.classList.toggle("is-collapsed");
-        layout.classList.toggle("sidebar-collapsed");
-      }
-      syncToggleState();
-    });
-  });
-
-  sidebar.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      layout.classList.remove("sidebar-open");
-      syncToggleState();
-    });
-  });
-
-  document.addEventListener("click", (event) => {
-    if (!isMobileSidebar() || !layout.classList.contains("sidebar-open")) return;
-    if (event.target.closest("[data-sidebar]") || event.target.closest("[data-sidebar-toggle]")) return;
-    layout.classList.remove("sidebar-open");
-    syncToggleState();
-  });
-
-  window.addEventListener("resize", syncToggleState);
-  syncToggleState();
-}
-
-function attachNotificationDropdown() {
-  const button = document.querySelector("[data-notification-toggle]");
-  const menu = document.querySelector("[data-notification-menu]");
-  if (!button || !menu) return;
-  button.addEventListener("click", (event) => {
-    event.stopPropagation();
-    const expanded = button.getAttribute("aria-expanded") === "true";
-    button.setAttribute("aria-expanded", String(!expanded));
-    menu.hidden = expanded;
-  });
-  document.addEventListener("click", (event) => {
-    if (!menu.hidden && !event.target.closest(".notification-wrap")) {
-      button.setAttribute("aria-expanded", "false");
-      menu.hidden = true;
+    if (menuToggle && sideMenu && menuOverlay) {
+      menuToggle.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        sideMenu.classList.add("active");
+        menuOverlay.classList.add("active");
+        document.body.classList.add("menu-open");
+        menuToggle.setAttribute("aria-expanded", "true");
+      });
     }
-  });
+
+    if (closeMenu && sideMenu && menuOverlay) {
+      closeMenu.addEventListener("click", () => {
+        sideMenu.classList.remove("active");
+        menuOverlay.classList.remove("active");
+        document.body.classList.remove("menu-open");
+        menuToggle?.setAttribute("aria-expanded", "false");
+      });
+    }
+
+    if (menuOverlay && sideMenu) {
+      menuOverlay.addEventListener("click", () => {
+        sideMenu.classList.remove("active");
+        menuOverlay.classList.remove("active");
+        document.body.classList.remove("menu-open");
+        menuToggle?.setAttribute("aria-expanded", "false");
+      });
+    }
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindMenu);
+  } else {
+    bindMenu();
+  }
 }
 
-function attachFloatingActions() {
-  const fab = document.querySelector("[data-fab]");
-  const toggle = document.querySelector("[data-fab-toggle]");
-  if (!fab || !toggle) return;
-  toggle.addEventListener("click", () => {
-    const expanded = toggle.getAttribute("aria-expanded") === "true";
-    toggle.setAttribute("aria-expanded", String(!expanded));
-    fab.classList.toggle("is-open", !expanded);
+function attachEvents() {
+  document.addEventListener("click", (event) => {
+    const addButton = event.target.closest("[data-add-cart]");
+    if (addButton) addToCart(addButton.dataset.addCart);
+    const increase = event.target.closest("[data-increase]");
+    if (increase) increaseQuantity(increase.dataset.increase);
+    const decrease = event.target.closest("[data-decrease]");
+    if (decrease) decreaseQuantity(decrease.dataset.decrease);
+    const remove = event.target.closest("[data-remove-cart]");
+    if (remove) removeFromCart(remove.dataset.removeCart);
+    const deleteButton = event.target.closest("[data-delete-product]");
+    if (deleteButton) deleteProduct(deleteButton.dataset.deleteProduct);
+    const editButton = event.target.closest("[data-edit-product]");
+    if (editButton) editProduct(editButton.dataset.editProduct);
+    const quick = event.target.closest("[data-quick-filter]");
+    if (quick) {
+      filterState.quick = quick.dataset.quickFilter;
+      document.querySelectorAll("[data-quick-filter]").forEach((button) => button.classList.toggle("active", button === quick));
+      updateProductPage();
+    }
+    if (event.target.closest("[data-logout]") || event.target.closest("[data-admin-logout]")) logoutUser();
+    if (event.target.closest("[data-place-order]")) placeOrder();
   });
+
+  document.getElementById("customerLoginForm")?.addEventListener("submit", loginCustomer);
+  document.getElementById("vendorLoginForm")?.addEventListener("submit", loginVendor);
+  document.getElementById("adminLoginForm")?.addEventListener("submit", loginAdmin);
+  document.getElementById("addProductForm")?.addEventListener("submit", saveProduct);
+  document.getElementById("sortSelect")?.addEventListener("change", (event) => {
+    filterState.sort = event.target.value;
+    updateProductPage();
+  });
+  document.querySelectorAll("[data-auth-tab]").forEach((tab) => tab.addEventListener("click", () => switchLoginTab(tab.dataset.authTab)));
+  document.querySelectorAll("[data-sidebar-toggle]:not(#menuToggle)").forEach((toggle) => toggle.addEventListener("click", () => {
+    const panel = document.getElementById(toggle.getAttribute("aria-controls") || "navPanel");
+    const open = toggle.getAttribute("aria-expanded") === "true";
+    toggle.setAttribute("aria-expanded", String(!open));
+    if (panel) panel.classList.toggle("is-open", !open);
+    document.querySelector(".vendor-layout")?.classList.toggle("sidebar-open");
+  }));
 }
 
-function attachMenuHighlight() {
-  const currentPage = window.location.pathname.split("/").pop() || "index.html";
-  document.querySelectorAll(".nav-link").forEach((link) => {
-    const href = link.getAttribute("href") || "";
-    link.classList.toggle("active", href === currentPage);
-  });
-  document.querySelectorAll("[data-menu-item]").forEach((link) => link.classList.remove("is-active"));
-  document.querySelectorAll("[data-menu-item]").forEach((link) => {
-    const href = link.getAttribute("href") || "";
-    const hrefPage = href.split("#")[0];
-    if (hrefPage === currentPage) link.classList.add("is-active");
-  });
-}
-
-function attachBottomNavState() {
-  document.querySelectorAll("[data-bottom-nav]").forEach((button) => {
-    button.addEventListener("click", () => {
-      document.querySelectorAll("[data-bottom-nav]").forEach((item) => item.classList.remove("is-active"));
-      button.classList.add("is-active");
-    });
-  });
+function switchLoginTab(tabName) {
+  document.querySelectorAll("[data-auth-tab]").forEach((tab) => tab.classList.toggle("active", tab.dataset.authTab === tabName));
+  document.querySelectorAll("[data-auth-panel]").forEach((panel) => panel.hidden = panel.dataset.authPanel !== tabName);
 }
 
 function attachDashboardSearch() {
   const input = document.querySelector("[data-dashboard-search]");
   if (!input) return;
-  const rows = Array.from(document.querySelectorAll("[data-search-row]"));
   input.addEventListener("input", () => {
     const query = input.value.trim().toLowerCase();
-    rows.forEach((row) => {
+    document.querySelectorAll("[data-search-row]").forEach((row) => {
       row.hidden = !row.textContent.toLowerCase().includes(query);
     });
   });
 }
 
-function attachTestimonialSearch() {
-  const input = document.querySelector("[data-testimonial-search]");
-  if (!input) return;
-  input.addEventListener("input", () => {
-    const query = input.value.trim().toLowerCase();
-    const filtered = testimonials.filter((item) => [item.name, item.product, item.review, item.status].some((value) => value.toLowerCase().includes(query)));
-    renderTestimonialsPage(filtered);
+function attachMenuHighlight() {
+  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  document.querySelectorAll(".nav-link, [data-menu-item]").forEach((link) => {
+    const hrefPage = (link.getAttribute("href") || "").split("#")[0];
+    link.classList.toggle("active", hrefPage === currentPage);
+    link.classList.toggle("is-active", hrefPage === currentPage);
   });
 }
 
-function renderVendorDashboard() {
-  renderDashboardStats();
-  renderSalesChart();
-  renderLowStockAlerts();
-  renderTestimonialSummary();
-  renderDashboardTables();
-  attachDashboardSearch();
+function loadEditProduct() {
+  const id = new URLSearchParams(window.location.search).get("edit");
+  if (id) editProduct(id);
 }
 
-const page = document.body.dataset.page;
-attachAdminSidebar();
-attachLoadingButtons();
-attachSidebarToggle();
-attachNotificationDropdown();
-attachFloatingActions();
-attachMenuHighlight();
-attachBottomNavState();
-
-if (page === "home") renderHomePage();
-if (page === "products") renderProductsPage();
-if (page === "dashboard") renderVendorDashboard();
-if (page === "testimonials") {
-  renderTestimonialsPage();
-  attachTestimonialSearch();
+function ensureDemoVendor() {
+  const products = getProducts();
+  let changed = false;
+  products.forEach((product) => {
+    if (!product.vendorEmail) {
+      product.vendorEmail = DEMO_VENDOR.email;
+      product.createdAt = product.createdAt || Date.now();
+      changed = true;
+    }
+  });
+  if (changed) saveProducts(products);
 }
+
+function init() {
+  ensureDemoVendor();
+  protectCurrentPage();
+  updateNavbarByRole();
+  ensureHamburgerMenu();
+  attachEvents();
+  attachMenuHighlight();
+  updateCartCount();
+  const page = document.body.dataset.page;
+  if (page === "login") switchLoginTab("customer");
+  if (page === "home") renderHomePage();
+  if (page === "products") renderProductsPage();
+  if (page === "product-details") renderProductDetails();
+  if (page === "cart") renderCart();
+  if (["vendor-dashboard", "dashboard"].includes(page)) {
+    renderVendorDashboard();
+    attachDashboardSearch();
+  }
+  if (page === "admin-dashboard") {
+    renderAdminDashboard();
+    attachDashboardSearch();
+  }
+  if (page === "add-product") loadEditProduct();
+  if (page === "manage-products") renderManageProducts();
+  if (page === "vendor-orders") renderVendorOrders();
+}
+
+window.getCurrentRole = getCurrentRole;
+window.requireRole = requireRole;
+window.requireAnyRole = requireAnyRole;
+window.loginCustomer = loginCustomer;
+window.loginVendor = loginVendor;
+window.loginAdmin = loginAdmin;
+window.logoutUser = logoutUser;
+window.updateNavbarByRole = updateNavbarByRole;
+window.checkAdmin = checkAdmin;
+window.adminLogin = adminLogin;
+window.adminLogout = adminLogout;
+window.saveProduct = saveProduct;
+window.getProducts = getProducts;
+window.renderProducts = renderProducts;
+window.addToCart = addToCart;
+window.updateCartCount = updateCartCount;
+window.renderCart = renderCart;
+window.increaseQuantity = increaseQuantity;
+window.decreaseQuantity = decreaseQuantity;
+window.removeFromCart = removeFromCart;
+window.deleteProduct = deleteProduct;
+
+init();
+attachHamburgerMenu();

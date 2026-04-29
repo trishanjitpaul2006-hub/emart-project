@@ -1,86 +1,80 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EMART Login | Customer and Vendor Access</title>
-  <meta name="description" content="Login or sign up to access the EMART customer and vendor experience." />
+  <title>EMART Access</title>
+  <meta name="description" content="Customer, vendor, and admin login for EMART." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body data-page="login">
-  <div class="page-shell page-shell-narrow">
-    <header class="navbar glass-panel">
-      <a class="brand" href="index.html" aria-label="EMART Home">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
-            <defs>
-              <linearGradient id="brandGradientLogin" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#8f6dff" />
-                <stop offset="45%" stop-color="#39d4ff" />
-                <stop offset="100%" stop-color="#5f8dff" />
-              </linearGradient>
-            </defs>
-            <path d="M16 14h30a5 5 0 0 1 0 10H26v8h18a5 5 0 0 1 0 10H26v8h20a5 5 0 0 1 0 10H16z" fill="url(#brandGradientLogin)"/>
-            <path d="M41 18h7l4 18H28" fill="none" stroke="#e6f8ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
-            <circle cx="34" cy="50" r="3" fill="#e6f8ff"/>
-            <circle cx="47" cy="50" r="3" fill="#e6f8ff"/>
-          </svg>
-        </span>
-        <span>
-          <strong>EMART</strong>
-          <small>Premium everyday shopping</small>
-        </span>
-      </a>
-      <div class="nav-actions">
-        <a class="ghost-button" href="index.html">Back Home</a>
+  <main class="role-login-page">
+    <section class="role-login-shell">
+      <div class="role-login-brand">
+        <a class="brand" href="index.html" aria-label="EMART Home">
+          <span class="brand-mark" aria-hidden="true">E</span>
+          <span>
+            <strong>EMART</strong>
+            <small>role based access</small>
+          </span>
+        </a>
+        <h1>Welcome to EMART</h1>
+        <p>Choose your access type. Customers shop, vendors manage products, and admins oversee the whole store.</p>
       </div>
-    </header>
 
-    <main>
-      <section class="section-block auth-layout reveal">
-        <div class="auth-side glass-panel">
-          <span class="eyebrow">Access EMART</span>
-          <h1>One clean entry point for customers and vendors</h1>
-          <p>Frontend-only auth UI for now, ready to connect later with backend and database flows.</p>
-          <ul class="auth-points">
-            <li>Customer shopping access</li>
-            <li>Vendor dashboard access</li>
-            <li>Responsive modern form design</li>
-          </ul>
+      <div class="role-login-card glass-panel">
+        <div class="auth-tabs role-tabs">
+          <button class="filter-pill active" type="button" data-auth-tab="customer">Customer Login</button>
+          <button class="filter-pill" type="button" data-auth-tab="vendor">Vendor Login</button>
+          <button class="filter-pill" type="button" data-auth-tab="admin">Admin Login</button>
         </div>
 
-        <div class="auth-card glass-panel">
-          <div class="auth-tabs">
-            <button class="filter-pill active" type="button" data-auth-tab="customer">Customer Login</button>
-            <button class="filter-pill" type="button" data-auth-tab="vendor">Vendor Login</button>
-          </div>
+        <form class="auth-form role-panel" id="customerLoginForm" data-auth-panel="customer">
+          <span class="eyebrow">Customer</span>
+          <h2>Shop and checkout</h2>
+          <label class="form-field">
+            <span>Email</span>
+            <input id="customerEmail" type="email" value="customer@emart.com" required />
+          </label>
+          <label class="form-field">
+            <span>Password</span>
+            <input id="customerPassword" type="password" value="customer123" required />
+          </label>
+          <p class="form-message" id="customerLoginMessage" aria-live="polite"></p>
+          <button class="primary-button form-button" type="submit">Continue</button>
+        </form>
 
-          <form class="auth-form" id="authForm">
-            <label class="form-field">
-              <span>Email</span>
-              <input type="email" placeholder="you@example.com" />
-            </label>
-            <label class="form-field">
-              <span>Password</span>
-              <input type="password" placeholder="Enter password" />
-            </label>
-            <label class="form-field" id="vendorCodeField" hidden>
-              <span>Vendor ID</span>
-              <input type="text" placeholder="Enter vendor ID" />
-            </label>
-            <button class="primary-button form-button" type="button" data-loading-button>Continue</button>
-          </form>
+        <form class="auth-form role-panel" id="vendorLoginForm" data-auth-panel="vendor" hidden>
+          <span class="eyebrow">Vendor</span>
+          <h2>Manage your products</h2>
+          <label class="form-field">
+            <span>Email</span>
+            <input id="vendorEmail" type="email" value="vendor@emart.com" required />
+          </label>
+          <label class="form-field">
+            <span>Password</span>
+            <input id="vendorPassword" type="password" value="vendor123" required />
+          </label>
+          <p class="form-message" id="vendorLoginMessage" aria-live="polite"></p>
+          <button class="primary-button form-button" type="submit">Continue</button>
+        </form>
 
-          <div class="auth-footer">
-            <p>New to EMART? <a href="#">Create an account</a></p>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
+        <form class="auth-form role-panel" id="adminLoginForm" data-auth-panel="admin" hidden>
+          <span class="eyebrow">Admin</span>
+          <h2>Control website data</h2>
+          <label class="form-field">
+            <span>Admin password</span>
+            <input id="adminPassword" type="password" value="admin123" required />
+          </label>
+          <p class="form-message" id="adminLoginMessage" aria-live="polite"></p>
+          <button class="primary-button form-button" type="submit">Continue</button>
+        </form>
+      </div>
+    </section>
+  </main>
 
   <script src="script.js"></script>
 </body>
