@@ -4,6 +4,7 @@ const ORDER_KEY = "emartOrders";
 const ROLE_KEY = "emartRole";
 const USER_KEY = "emartUser";
 const USER_LIST_KEY = "emartUsers";
+const DEAL_END_KEY = "emartDealEndTime";
 const RAZORPAY_CHECKOUT_URL = "https://checkout.razorpay.com/v1/checkout.js";
 const RAZORPAY_TEST_KEY = "rzp_test_YOUR_KEY_HERE";
 const ADMIN_PASSWORD = "admin123";
@@ -57,6 +58,17 @@ const categories = [
 ];
 
 const DEMO_PRODUCTS = [
+  {
+    id: "grand-deal-earbuds",
+    name: "Wireless Bluetooth Earbuds",
+    category: "electronics",
+    price: 999,
+    oldPrice: 2999,
+    discount: 67,
+    stock: 40,
+    image: "https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?auto=format&fit=crop&w=900&q=90",
+    description: "Grand Deal earbuds with glossy charging case, deep bass, clear calls, and all-day comfort."
+  },
   {
     id: "demo-wireless-bluetooth-earbuds",
     name: "Wireless Bluetooth Earbuds",
@@ -491,6 +503,53 @@ function addToCart(productId) {
 function buyNow(productId) {
   addToCart(productId);
   if (getCurrentRole() === "customer") window.location.href = "cart.html";
+}
+
+function heroDealBuyNow(productId) {
+  const button = document.querySelector("[data-hero-buy-now]");
+  if (button?.disabled) return;
+  buyNow(productId);
+}
+
+function getDealEndTime() {
+  const stored = Number(localStorage.getItem(DEAL_END_KEY) || 0);
+  if (stored && stored > Date.now()) return stored;
+  const nextEnd = Date.now() + 2.5 * 60 * 60 * 1000;
+  localStorage.setItem(DEAL_END_KEY, String(nextEnd));
+  return nextEnd;
+}
+
+function formatCountdown(ms) {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+  const seconds = String(totalSeconds % 60).padStart(2, "0");
+  return `${hours}:${minutes}:${seconds}`;
+}
+
+function initHeroDealCountdown() {
+  const countdown = document.getElementById("dealCountdown");
+  const button = document.querySelector("[data-hero-buy-now]");
+  if (!countdown || !button) return;
+  const endTime = getDealEndTime();
+
+  const tick = () => {
+    const remaining = endTime - Date.now();
+    if (remaining <= 0) {
+      countdown.textContent = "Deal expired";
+      button.textContent = "Deal Expired";
+      button.disabled = true;
+      button.classList.add("is-disabled");
+      return;
+    }
+    countdown.textContent = formatCountdown(remaining);
+  };
+
+  tick();
+  const timer = setInterval(() => {
+    tick();
+    if (button.disabled) clearInterval(timer);
+  }, 1000);
 }
 
 function updateCartCount() {
@@ -1127,6 +1186,8 @@ function attachEvents() {
     if (addButton) addToCart(addButton.dataset.addCart);
     const buyButton = event.target.closest("[data-buy-now]");
     if (buyButton) buyNow(buyButton.dataset.buyNow);
+    const heroBuy = event.target.closest("[data-hero-buy-now]");
+    if (heroBuy) heroDealBuyNow(heroBuy.dataset.heroBuyNow);
     const increase = event.target.closest("[data-increase]");
     if (increase) increaseQuantity(increase.dataset.increase);
     const decrease = event.target.closest("[data-decrease]");
@@ -1251,7 +1312,10 @@ function init() {
   updateCartCount();
   const page = document.body.dataset.page;
   if (page === "login") switchLoginTab("customer");
-  if (page === "home") renderHomePage();
+  if (page === "home") {
+    renderHomePage();
+    initHeroDealCountdown();
+  }
   if (page === "products") renderProductsPage();
   if (page === "product-details") renderProductDetails();
   if (page === "cart") renderCart();
