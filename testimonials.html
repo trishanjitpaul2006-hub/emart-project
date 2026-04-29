@@ -33,7 +33,7 @@
             <span class="menu-icon">
               <svg viewBox="0 0 24 24"><path d="M6 7.5 12 4l6 3.5v9L12 20l-6-3.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
             </span>
-            <span class="menu-label">Products</span>
+            <span class="menu-label">Product Management</span>
           </a>
           <a class="vendor-menu-link" href="dashboard.html#categories" data-menu-item>
             <span class="menu-icon">
@@ -77,6 +77,12 @@
             </span>
             <span class="menu-label">Settings</span>
           </a>
+          <a class="vendor-menu-link" href="login.html" data-menu-item>
+            <span class="menu-icon">
+              <svg viewBox="0 0 24 24"><path d="M15 7V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2M10 12h10M17 9l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="menu-label">Logout</span>
+          </a>
         </nav>
 
         <button class="sidebar-collapse" type="button" data-sidebar-toggle aria-label="Collapse sidebar">
@@ -90,15 +96,22 @@
 
     <main class="vendor-main">
       <header class="vendor-topbar glass-panel">
-        <div>
-          <span class="eyebrow">Voice of customer</span>
-          <h1>Testimonials</h1>
+        <div class="topbar-title">
+          <button class="dashboard-menu-toggle" type="button" data-sidebar-toggle aria-label="Toggle sidebar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <div>
+            <span class="eyebrow">Voice of customer</span>
+            <h1>Testimonials</h1>
+          </div>
         </div>
 
         <div class="topbar-actions">
           <label class="topbar-search">
             <span class="search-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 1 1 0 13a6.5 6.5 0 0 1 0-13Zm0 0 8.5 8.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 1 1 0 13a6.5 6.5 0 0 1 0-13M15.2 15.2 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </span>
             <input type="search" placeholder="Search testimonials, products, customers" data-testimonial-search />
           </label>

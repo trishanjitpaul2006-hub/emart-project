@@ -204,14 +204,68 @@ function attachLoadingButtons() {
   });
 }
 
-function attachMobileNav() {
+function attachAdminSidebar() {
   const toggle = document.querySelector(".mobile-nav-toggle");
-  const panel = document.getElementById("navPanel");
-  if (!toggle || !panel) return;
+  if (!toggle || document.querySelector(".vendor-layout")) return;
+
+  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  const menuItems = [
+    { label: "Dashboard", href: "dashboard.html", match: ["dashboard.html"] },
+    { label: "Product Management", href: "products.html", match: ["products.html"] },
+    { label: "Add Product", href: "add-product.html", match: ["add-product.html"] },
+    { label: "Orders", href: "dashboard.html#recent-orders", match: [] },
+    { label: "Customers", href: "dashboard.html#customers", match: [] },
+    { label: "Categories", href: "dashboard.html#categories", match: [] },
+    { label: "Reviews", href: "testimonials.html", match: [] },
+    { label: "Testimonials", href: "testimonials.html", match: ["testimonials.html"] },
+    { label: "Reports", href: "dashboard.html#reports", match: [] },
+    { label: "Settings", href: "dashboard.html#settings", match: [] },
+    { label: "Logout", href: "login.html", match: [] }
+  ];
+
+  const overlay = document.createElement("div");
+  overlay.className = "admin-sidebar-overlay";
+  overlay.hidden = true;
+
+  const sidebar = document.createElement("aside");
+  sidebar.className = "admin-sidebar";
+  sidebar.id = "adminSidebar";
+  sidebar.setAttribute("aria-label", "Dashboard menu");
+  sidebar.setAttribute("aria-hidden", "true");
+  sidebar.innerHTML = `
+    <div class="admin-sidebar-head">
+      <a class="admin-sidebar-brand" href="index.html" aria-label="EMART Home">
+        <span class="admin-brand-mark" aria-hidden="true">E</span>
+        <span><strong>EMART</strong><small>Admin menu</small></span>
+      </a>
+      <button class="admin-sidebar-close" type="button" aria-label="Close admin menu">
+        <span></span><span></span>
+      </button>
+    </div>
+    <nav class="admin-sidebar-nav">
+      ${menuItems.map((item) => `<a class="admin-sidebar-link${item.match.includes(currentPage) ? " is-active" : ""}" href="${item.href}">${item.label}</a>`).join("")}
+    </nav>
+  `;
+
+  document.body.append(overlay, sidebar);
+  const closeButton = sidebar.querySelector(".admin-sidebar-close");
+  const links = sidebar.querySelectorAll("a");
+
+  const setOpen = (open) => {
+    document.body.classList.toggle("admin-sidebar-open", open);
+    toggle.setAttribute("aria-expanded", String(open));
+    sidebar.setAttribute("aria-hidden", String(!open));
+    overlay.hidden = !open;
+  };
+
   toggle.addEventListener("click", () => {
-    const isOpen = toggle.getAttribute("aria-expanded") === "true";
-    toggle.setAttribute("aria-expanded", String(!isOpen));
-    panel.classList.toggle("is-open", !isOpen);
+    setOpen(!document.body.classList.contains("admin-sidebar-open"));
+  });
+  closeButton.addEventListener("click", () => setOpen(false));
+  overlay.addEventListener("click", () => setOpen(false));
+  links.forEach((link) => link.addEventListener("click", () => setOpen(false)));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setOpen(false);
   });
 }
 
@@ -242,7 +296,20 @@ function productRowMarkup(product) {
 }
 
 function testimonialPreviewMarkup(item) {
-  return `<article class="testimonial-preview-card"><strong>${item.name}</strong><p>${item.review.slice(0, 72)}...</p><span class="testimonial-product">${item.product}</span></article>`;
+  return `<article class="testimonial-preview-card"><div class="testimonial-card-top"><div class="testimonial-user"><span class="testimonial-avatar">${item.initials}</span><div><strong>${item.name}</strong><span class="testimonial-product">${item.product}</span></div></div><span class="status-badge ${item.status.toLowerCase()}">${item.status}</span></div><div class="testimonial-meta"><span class="testimonial-rating">${"\u2605".repeat(item.rating)}</span><span class="testimonial-product">${item.tone}</span></div><p>${item.review}</p></article>`;
+}
+
+function renderTestimonialSummary() {
+  const host = document.getElementById("testimonialSummary");
+  if (!host) return;
+  const activeCount = testimonials.filter((item) => item.status === "Active").length;
+  const averageRating = (testimonials.reduce((total, item) => total + item.rating, 0) / testimonials.length).toFixed(1);
+  const hiddenCount = testimonials.length - activeCount;
+  host.innerHTML = [
+    { label: "Active testimonials", value: activeCount, change: "+12 this week" },
+    { label: "Average rating", value: averageRating, change: "Verified buyers" },
+    { label: "Needs review", value: hiddenCount, change: "Moderation queue" }
+  ].map((item) => `<article class="testimonial-summary-card"><span>${item.label}</span><strong>${item.value}</strong><small>${item.change}</small></article>`).join("");
 }
 
 function renderDashboardTables() {
@@ -251,7 +318,7 @@ function renderDashboardTables() {
   const previewHost = document.getElementById("testimonialPreview");
   if (ordersHost) ordersHost.innerHTML = orders.map(orderRowMarkup).join("");
   if (productsHost) productsHost.innerHTML = products.map(productRowMarkup).join("");
-  if (previewHost) previewHost.innerHTML = testimonials.slice(0, 3).map(testimonialPreviewMarkup).join("");
+  if (previewHost) previewHost.innerHTML = testimonials.filter((item) => item.status === "Active").slice(0, 4).map(testimonialPreviewMarkup).join("");
 }
 
 function renderTestimonialsPage(items = testimonials) {
@@ -263,12 +330,44 @@ function renderTestimonialsPage(items = testimonials) {
 function attachSidebarToggle() {
   const layout = document.querySelector(".vendor-layout");
   const sidebar = document.querySelector("[data-sidebar]");
-  const toggle = document.querySelector("[data-sidebar-toggle]");
-  if (!layout || !sidebar || !toggle) return;
-  toggle.addEventListener("click", () => {
-    sidebar.classList.toggle("is-collapsed");
-    layout.classList.toggle("sidebar-collapsed");
+  const toggles = document.querySelectorAll("[data-sidebar-toggle]");
+  if (!layout || !sidebar || !toggles.length) return;
+
+  const isMobileSidebar = () => window.matchMedia("(max-width: 759px)").matches;
+  const syncToggleState = () => {
+    const expanded = isMobileSidebar() ? layout.classList.contains("sidebar-open") : !layout.classList.contains("sidebar-collapsed");
+    toggles.forEach((button) => button.setAttribute("aria-expanded", String(expanded)));
+  };
+
+  toggles.forEach((toggle) => {
+    toggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (isMobileSidebar()) {
+        layout.classList.toggle("sidebar-open");
+      } else {
+        sidebar.classList.toggle("is-collapsed");
+        layout.classList.toggle("sidebar-collapsed");
+      }
+      syncToggleState();
+    });
   });
+
+  sidebar.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      layout.classList.remove("sidebar-open");
+      syncToggleState();
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!isMobileSidebar() || !layout.classList.contains("sidebar-open")) return;
+    if (event.target.closest("[data-sidebar]") || event.target.closest("[data-sidebar-toggle]")) return;
+    layout.classList.remove("sidebar-open");
+    syncToggleState();
+  });
+
+  window.addEventListener("resize", syncToggleState);
+  syncToggleState();
 }
 
 function attachNotificationDropdown() {
@@ -302,14 +401,15 @@ function attachFloatingActions() {
 
 function attachMenuHighlight() {
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  document.querySelectorAll(".nav-link").forEach((link) => {
+    const href = link.getAttribute("href") || "";
+    link.classList.toggle("active", href === currentPage);
+  });
+  document.querySelectorAll("[data-menu-item]").forEach((link) => link.classList.remove("is-active"));
   document.querySelectorAll("[data-menu-item]").forEach((link) => {
     const href = link.getAttribute("href") || "";
-    const isCurrent = href === currentPage || (currentPage === "dashboard.html" && href === "dashboard.html") || (currentPage === "testimonials.html" && href === "testimonials.html");
-    if (isCurrent || (currentPage === "dashboard.html" && href.startsWith("#"))) {
-      if (href === currentPage || href === "dashboard.html" && currentPage === "dashboard.html" || href === "testimonials.html" && currentPage === "testimonials.html") {
-        link.classList.add("is-active");
-      }
-    }
+    const hrefPage = href.split("#")[0];
+    if (hrefPage === currentPage) link.classList.add("is-active");
   });
 }
 
@@ -348,12 +448,13 @@ function renderVendorDashboard() {
   renderDashboardStats();
   renderSalesChart();
   renderLowStockAlerts();
+  renderTestimonialSummary();
   renderDashboardTables();
   attachDashboardSearch();
 }
 
 const page = document.body.dataset.page;
-attachMobileNav();
+attachAdminSidebar();
 attachLoadingButtons();
 attachSidebarToggle();
 attachNotificationDropdown();

@@ -13,6 +13,12 @@
 <body data-page="products">
   <div class="page-shell">
     <header class="navbar glass-panel">
+      <button class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="adminSidebar" aria-label="Open admin menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
       <a class="brand" href="index.html" aria-label="EMART Home">
         <span class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
@@ -35,25 +41,22 @@
         </span>
       </a>
 
-      <button class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="navPanel" aria-label="Open navigation">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
+      <a class="header-cart" href="cart.html" aria-label="View cart">
+        <svg viewBox="0 0 24 24"><path d="M3 5h2l2.4 9.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L21 8H7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19" r="1.5"/><circle cx="18" cy="19" r="1.5"/></svg>
+      </a>
 
       <div class="nav-panel" id="navPanel">
         <nav class="nav-links">
           <a href="index.html" class="nav-link">Home</a>
           <a href="products.html" class="nav-link active">Products</a>
-          <a href="dashboard.html" class="nav-link">Dashboard</a>
-          <a href="add-product.html" class="nav-link">Add Product</a>
+          <a href="cart.html" class="nav-link">Cart</a>
         </nav>
 
         <form class="nav-search" action="products.html">
           <span class="search-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 1 1 0 13a6.5 6.5 0 0 1 0-13Zm0 0 8.5 8.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 1 1 0 13a6.5 6.5 0 0 1 0-13M15.2 15.2 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </span>
-          <input type="search" name="q" placeholder="Search products, categories, collections" aria-label="Search products" />
+          <input type="search" name="q" placeholder="Search products, categories..." aria-label="Search products" />
           <button class="search-submit" type="submit">Search</button>
         </form>
 
@@ -61,7 +64,8 @@
           <a class="icon-button" href="cart.html" aria-label="View cart">
             <svg viewBox="0 0 24 24"><path d="M3 5h2l2.4 9.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L21 8H7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19" r="1.5"/><circle cx="18" cy="19" r="1.5"/></svg>
           </a>
-          <a class="ghost-button" href="login.html">Login / Signup</a>
+          <a class="auth-button login-button" href="login.html">Login</a>
+          <a class="auth-button signup-button" href="login.html">Sign Up</a>
         </div>
       </div>
     </header>

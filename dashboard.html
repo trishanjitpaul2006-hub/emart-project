@@ -33,7 +33,7 @@
             <span class="menu-icon">
               <svg viewBox="0 0 24 24"><path d="M6 7.5 12 4l6 3.5v9L12 20l-6-3.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6 7.5 12 11l6-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
             </span>
-            <span class="menu-label">Products</span>
+            <span class="menu-label">Product Management</span>
           </a>
           <a class="vendor-menu-link" href="#categories" data-menu-item>
             <span class="menu-icon">
@@ -53,18 +53,13 @@
             </span>
             <span class="menu-label">Customers</span>
           </a>
-          <a class="vendor-menu-link" href="testimonials.html" data-menu-item>
+          <a class="vendor-menu-link" href="#testimonials" data-menu-item>
             <span class="menu-icon">
               <svg viewBox="0 0 24 24"><path d="M7 10h6M7 14h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M5 5h14v10a2 2 0 0 1-2 2H9l-4 3v-5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
             </span>
-            <span class="menu-label">Reviews</span>
-          </a>
-          <a class="vendor-menu-link" href="testimonials.html" data-menu-item>
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24"><path d="M12 6v6l4 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
-            </span>
             <span class="menu-label">Testimonials</span>
           </a>
+          
           <a class="vendor-menu-link" href="#reports" data-menu-item>
             <span class="menu-icon">
               <svg viewBox="0 0 24 24"><path d="M6 18V9M12 18V6M18 18v-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 20h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -76,6 +71,12 @@
               <svg viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19 12a7.4 7.4 0 0 0-.1-1l2-1.5-2-3.4-2.4 1a7.7 7.7 0 0 0-1.7-1l-.3-2.5h-4l-.3 2.5a7.7 7.7 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5a7.4 7.4 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a7.7 7.7 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7.7 7.7 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5c.1-.3.1-.7.1-1Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
             </span>
             <span class="menu-label">Settings</span>
+          </a>
+          <a class="vendor-menu-link" href="login.html" data-menu-item>
+            <span class="menu-icon">
+              <svg viewBox="0 0 24 24"><path d="M15 7V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2M10 12h10M17 9l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="menu-label">Logout</span>
           </a>
         </nav>
 
@@ -90,15 +91,22 @@
 
     <main class="vendor-main">
       <header class="vendor-topbar glass-panel">
-        <div>
-          <span class="eyebrow">Vendor workspace</span>
-          <h1>Dashboard Overview</h1>
+        <div class="topbar-title">
+          <button class="dashboard-menu-toggle" type="button" data-sidebar-toggle aria-label="Toggle sidebar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <div>
+            <span class="eyebrow">Vendor workspace</span>
+            <h1>Dashboard Overview</h1>
+          </div>
         </div>
 
         <div class="topbar-actions">
           <label class="topbar-search">
             <span class="search-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 1 1 0 13a6.5 6.5 0 0 1 0-13Zm0 0 8.5 8.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M10.5 4a6.5 6.5 0 1 1 0 13a6.5 6.5 0 0 1 0-13M15.2 15.2 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </span>
             <input type="search" placeholder="Search orders, products, customers" data-dashboard-search />
           </label>
@@ -131,7 +139,7 @@
           <button class="profile-button" type="button">
             <span class="profile-avatar">TA</span>
             <span class="profile-copy">
-              <strong>Trisha Admin</strong>
+              <strong>Admin</strong>
               <small>Vendor Admin</small>
             </span>
           </button>
@@ -255,6 +263,45 @@
         </article>
       </section>
 
+      <section class="vendor-content-grid" id="testimonials">
+        <article class="vendor-panel glass-panel wide-panel">
+          <div class="panel-head">
+            <div>
+              <span class="eyebrow">Voice of customer</span>
+              <h2>Testimonials</h2>
+            </div>
+            <a class="panel-link" href="testimonials.html">Manage all</a>
+          </div>
+          <div class="testimonial-dashboard-summary" id="testimonialSummary"></div>
+          <div class="testimonial-preview-grid dashboard-testimonials" id="testimonialPreview"></div>
+        </article>
+
+        <article class="vendor-panel glass-panel">
+          <div class="panel-head">
+            <div>
+              <span class="eyebrow">Review insight</span>
+              <h2>Customer sentiment</h2>
+            </div>
+            <span class="panel-tag success">Trending up</span>
+          </div>
+          <div class="customer-pulse">
+            <article class="pulse-item">
+              <strong>4.8</strong>
+              <span>Average testimonial rating</span>
+            </article>
+            <article class="pulse-item">
+              <strong>84</strong>
+              <span>Published customer stories</span>
+            </article>
+            <article class="pulse-item">
+              <strong>92%</strong>
+              <span>Positive sentiment score</span>
+            </article>
+          </div>
+          <a class="panel-link" href="testimonials.html">Open testimonials</a>
+        </article>
+      </section>
+
       <section class="vendor-content-grid">
         <article class="vendor-panel glass-panel wide-panel">
           <div class="panel-head">
@@ -283,11 +330,22 @@
         <article class="vendor-panel glass-panel">
           <div class="panel-head">
             <div>
-              <span class="eyebrow">Reviews</span>
-              <h2>Testimonials snapshot</h2>
+              <span class="eyebrow">Store actions</span>
+              <h2>Next steps</h2>
             </div>
           </div>
-          <div class="testimonial-preview-grid" id="testimonialPreview"></div>
+          <div class="alert-stack">
+            <article class="alert-item">
+              <strong>Feature top review</strong>
+              <p>Promote the strongest product story on the storefront this week.</p>
+              <div class="alert-meta"><span>5 star</span><span>High trust</span></div>
+            </article>
+            <article class="alert-item">
+              <strong>Reply to hidden reviews</strong>
+              <p>Review moderated testimonials before the next campaign goes live.</p>
+              <div class="alert-meta"><span>2 pending</span><span>Today</span></div>
+            </article>
+          </div>
         </article>
       </section>
 
