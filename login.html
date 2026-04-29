@@ -26,6 +26,13 @@
       </div>
 
       <div class="role-login-card glass-panel">
+        <div class="login-card-head">
+          <span class="brand-mark small-brand-mark" aria-hidden="true">E</span>
+          <div>
+            <span class="eyebrow">Secure access</span>
+            <h2>Sign in to EMART</h2>
+          </div>
+        </div>
         <div class="auth-tabs role-tabs">
           <button class="filter-pill active" type="button" data-auth-tab="customer">Customer Login</button>
           <button class="filter-pill" type="button" data-auth-tab="vendor">Vendor Login</button>
@@ -37,11 +44,11 @@
           <h2>Shop and checkout</h2>
           <label class="form-field">
             <span>Email</span>
-            <input id="customerEmail" type="email" value="customer@emart.com" required />
+            <div class="input-icon-field"><span>@</span><input id="customerEmail" type="email" value="customer@emart.com" required /></div>
           </label>
           <label class="form-field">
             <span>Password</span>
-            <input id="customerPassword" type="password" value="customer123" required />
+            <div class="input-icon-field"><span>*</span><input id="customerPassword" type="password" value="customer123" required /></div>
           </label>
           <p class="form-message" id="customerLoginMessage" aria-live="polite"></p>
           <button class="primary-button form-button" type="submit">Continue</button>
@@ -52,11 +59,11 @@
           <h2>Manage your products</h2>
           <label class="form-field">
             <span>Email</span>
-            <input id="vendorEmail" type="email" value="vendor@emart.com" required />
+            <div class="input-icon-field"><span>@</span><input id="vendorEmail" type="email" value="vendor@emart.com" required /></div>
           </label>
           <label class="form-field">
             <span>Password</span>
-            <input id="vendorPassword" type="password" value="vendor123" required />
+            <div class="input-icon-field"><span>*</span><input id="vendorPassword" type="password" value="vendor123" required /></div>
           </label>
           <p class="form-message" id="vendorLoginMessage" aria-live="polite"></p>
           <button class="primary-button form-button" type="submit">Continue</button>
@@ -66,8 +73,12 @@
           <span class="eyebrow">Admin</span>
           <h2>Control website data</h2>
           <label class="form-field">
-            <span>Admin password</span>
-            <input id="adminPassword" type="password" value="admin123" required />
+            <span>Username</span>
+            <div class="input-icon-field"><span>@</span><input id="adminUsername" type="text" value="admin" required /></div>
+          </label>
+          <label class="form-field">
+            <span>Password</span>
+            <div class="input-icon-field"><span>*</span><input id="adminPassword" type="password" value="admin123" required /></div>
           </label>
           <p class="form-message" id="adminLoginMessage" aria-live="polite"></p>
           <button class="primary-button form-button" type="submit">Continue</button>

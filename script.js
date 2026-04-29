@@ -1,23 +1,59 @@
 const PRODUCT_KEY = "emartProducts";
 const CART_KEY = "emartCart";
 const ORDER_KEY = "emartOrders";
-const ROLE_KEY = "emartUserRole";
-const USER_KEY = "emartCurrentUser";
-const TOKEN_KEY = "emartAuthToken";
-const API_BASE_URL = "http://localhost:5000/api";
+const ROLE_KEY = "emartRole";
+const USER_KEY = "emartUser";
+const USER_LIST_KEY = "emartUsers";
 const RAZORPAY_CHECKOUT_URL = "https://checkout.razorpay.com/v1/checkout.js";
+const RAZORPAY_TEST_KEY = "rzp_test_YOUR_KEY_HERE";
 const ADMIN_PASSWORD = "admin123";
 const DEMO_CUSTOMER = { email: "customer@emart.com", password: "customer123", name: "Customer Demo" };
 const DEMO_VENDOR = { email: "vendor@emart.com", password: "vendor123", name: "Vendor Demo" };
+const DEMO_ADMIN = { username: "admin", password: "admin123", name: "Admin", email: "admin@emart.com" };
 
 const categories = [
-  { name: "Electronics", description: "Audio, wearables, smart essentials", value: "electronics" },
-  { name: "Fashion", description: "Modern fits and elevated basics", value: "fashion" },
-  { name: "Home & Kitchen", description: "Useful upgrades for every room", value: "home-kitchen" },
-  { name: "Beauty", description: "Premium daily care picks", value: "beauty" },
-  { name: "Sports", description: "Active gear and training picks", value: "sports" },
-  { name: "Books", description: "Smart reads for study and focus", value: "books" },
-  { name: "Accessories", description: "Everyday carry and style extras", value: "accessories" }
+  {
+    name: "Electronics",
+    description: "Audio, wearables, smart essentials",
+    value: "electronics",
+    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=85"
+  },
+  {
+    name: "Fashion",
+    description: "Modern fits and elevated basics",
+    value: "fashion",
+    image: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=700&q=85"
+  },
+  {
+    name: "Home & Kitchen",
+    description: "Useful upgrades for every room",
+    value: "home-kitchen",
+    image: "https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=700&q=85"
+  },
+  {
+    name: "Beauty",
+    description: "Premium daily care picks",
+    value: "beauty",
+    image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=700&q=85"
+  },
+  {
+    name: "Sports",
+    description: "Active gear and training picks",
+    value: "sports",
+    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=700&q=85"
+  },
+  {
+    name: "Books",
+    description: "Smart reads for study and focus",
+    value: "books",
+    image: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=700&q=85"
+  },
+  {
+    name: "Accessories",
+    description: "Everyday carry and style extras",
+    value: "accessories",
+    image: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&w=700&q=85"
+  }
 ];
 
 const DEMO_PRODUCTS = [
@@ -155,7 +191,7 @@ const DEMO_PRODUCTS = [
   }
 ];
 
-const filterState = { quick: "all", query: "", sort: "newest" };
+const filterState = { quick: "all", query: "", sort: "newest", price: "all" };
 
 function readStorage(key, fallback) {
   try {
@@ -171,37 +207,28 @@ function writeStorage(key, value) {
 }
 
 function getCurrentRole() {
-  return localStorage.getItem(ROLE_KEY) || "";
+  return localStorage.getItem(ROLE_KEY) || localStorage.getItem("emartUserRole") || "";
 }
 
 function getCurrentUser() {
-  return readStorage(USER_KEY, null);
+  return readStorage(USER_KEY, null) || readStorage("emartCurrentUser", null);
 }
 
 function setSession(role, user) {
   localStorage.setItem(ROLE_KEY, role);
-  writeStorage(USER_KEY, { role, ...user });
-  if (user?.token) localStorage.setItem(TOKEN_KEY, user.token);
-}
-
-function getAuthToken() {
-  return localStorage.getItem(TOKEN_KEY) || "";
-}
-
-async function apiFetch(path, options = {}) {
-  const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
-  const token = getAuthToken();
-  if (token) headers.Authorization = `Bearer ${token}`;
-
-  const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.message || "API request failed");
-  return data;
+  const sessionUser = { role, ...user };
+  writeStorage(USER_KEY, sessionUser);
+  const users = getUsers();
+  const key = sessionUser.email || sessionUser.username;
+  if (key && !users.some((item) => (item.email || item.username) === key)) {
+    users.push(sessionUser);
+    saveUsers(users);
+  }
 }
 
 function requireRole(role) {
   if (getCurrentRole() !== role) {
-    alert("Access denied");
+    alert(role === "admin" ? "Admin access required" : "Access denied");
     window.location.href = "login.html";
     return false;
   }
@@ -210,7 +237,7 @@ function requireRole(role) {
 
 function requireAnyRole(roles) {
   if (!roles.includes(getCurrentRole())) {
-    alert("Access denied");
+    alert(roles.length === 1 && roles[0] === "admin" ? "Admin access required" : "Access denied");
     window.location.href = "login.html";
     return false;
   }
@@ -223,83 +250,60 @@ function protectCurrentPage() {
   const adminPages = ["admin-dashboard"];
   if (vendorPages.includes(page)) requireAnyRole(["vendor", "admin"]);
   if (adminPages.includes(page)) requireRole("admin");
-  if (page === "cart") requireRole("customer");
 }
 
-async function loginWithApi({ email, password, role }) {
-  const result = await apiFetch("/auth/login", {
-    method: "POST",
-    body: JSON.stringify({ email, password, role })
-  });
-  setSession(result.user.role, { ...result.user, token: result.token });
-  return result.user;
+function protectPage() {
+  return protectCurrentPage();
 }
 
-async function loginCustomer(event) {
+function loginCustomer(event) {
   if (event) event.preventDefault();
   const email = document.getElementById("customerEmail")?.value.trim();
   const password = document.getElementById("customerPassword")?.value;
   const message = document.getElementById("customerLoginMessage");
-  try {
-    const user = await loginWithApi({ email, password, role: "customer" });
+  if (email === DEMO_CUSTOMER.email && password === DEMO_CUSTOMER.password) {
+    setSession("customer", { id: "customer-demo", email, name: DEMO_CUSTOMER.name });
     showFormMessage(message, "Login successful, redirecting...", "success");
     setTimeout(() => window.location.href = "index.html", 450);
-  } catch (error) {
-    if (email === DEMO_CUSTOMER.email && password === DEMO_CUSTOMER.password) {
-      setSession("customer", { email, name: DEMO_CUSTOMER.name });
-      showFormMessage(message, "Backend offline. Demo login active.", "success");
-      setTimeout(() => window.location.href = "index.html", 450);
-      return;
-    }
-    showFormMessage(message, "Wrong email or password.", "error");
+    return;
   }
+  showFormMessage(message, "Wrong email or password.", "error");
 }
 
-async function loginVendor(event) {
+function loginVendor(event) {
   if (event) event.preventDefault();
   const email = document.getElementById("vendorEmail")?.value.trim();
   const password = document.getElementById("vendorPassword")?.value;
   const message = document.getElementById("vendorLoginMessage");
-  try {
-    await loginWithApi({ email, password, role: "vendor" });
+  if (email === DEMO_VENDOR.email && password === DEMO_VENDOR.password) {
+    setSession("vendor", { id: "vendor-demo", email, name: DEMO_VENDOR.name });
     ensureDemoVendor();
     showFormMessage(message, "Login successful, redirecting...", "success");
     setTimeout(() => window.location.href = "vendor-dashboard.html", 450);
-  } catch (error) {
-    if (email === DEMO_VENDOR.email && password === DEMO_VENDOR.password) {
-      setSession("vendor", { email, name: DEMO_VENDOR.name });
-      ensureDemoVendor();
-      showFormMessage(message, "Backend offline. Demo login active.", "success");
-      setTimeout(() => window.location.href = "vendor-dashboard.html", 450);
-      return;
-    }
-    showFormMessage(message, "Wrong email or password.", "error");
+    return;
   }
+  showFormMessage(message, "Wrong email or password.", "error");
 }
 
-async function loginAdmin(event) {
+function loginAdmin(event) {
   if (event) event.preventDefault();
+  const username = document.getElementById("adminUsername")?.value.trim();
   const password = document.getElementById("adminPassword")?.value;
   const message = document.getElementById("adminLoginMessage");
-  try {
-    await loginWithApi({ email: "admin@emart.com", password, role: "admin" });
+  if (username === DEMO_ADMIN.username && password === DEMO_ADMIN.password) {
+    setSession("admin", { id: "admin-demo", username, email: DEMO_ADMIN.email, name: DEMO_ADMIN.name });
     showFormMessage(message, "Login successful, redirecting...", "success");
     setTimeout(() => window.location.href = "admin-dashboard.html", 450);
-  } catch (error) {
-    if (password === ADMIN_PASSWORD) {
-      setSession("admin", { email: "admin@emart.com", name: "Admin" });
-      showFormMessage(message, "Backend offline. Demo admin active.", "success");
-      setTimeout(() => window.location.href = "admin-dashboard.html", 450);
-      return;
-    }
-    showFormMessage(message, "Wrong password.", "error");
+    return;
   }
+  showFormMessage(message, "Wrong username or password.", "error");
 }
 
 function logoutUser() {
   localStorage.removeItem(ROLE_KEY);
   localStorage.removeItem(USER_KEY);
-  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem("emartUserRole");
+  localStorage.removeItem("emartCurrentUser");
   localStorage.removeItem("emartAdminSession");
   window.location.href = "login.html";
 }
@@ -330,32 +334,29 @@ function saveProducts(products) {
   writeStorage(PRODUCT_KEY, products);
 }
 
-async function loadProductsFromApi() {
-  try {
-    const products = await apiFetch("/products");
-    if (Array.isArray(products)) saveProducts(products);
-    return products;
-  } catch (error) {
-    return getProducts();
-  }
-}
-
-async function saveProductToApi(product) {
-  const editing = getProducts().some((item) => String(item.id) === String(product.id));
-  const path = editing ? `/products/${encodeURIComponent(product.id)}` : "/products";
-  return apiFetch(path, {
-    method: editing ? "PUT" : "POST",
-    body: JSON.stringify(product)
+function getUsers() {
+  const stored = readStorage(USER_LIST_KEY, []);
+  const defaults = [
+    { id: "customer-demo", name: DEMO_CUSTOMER.name, email: DEMO_CUSTOMER.email, role: "customer" },
+    { id: "vendor-demo", name: DEMO_VENDOR.name, email: DEMO_VENDOR.email, role: "vendor" },
+    { id: "admin-demo", name: DEMO_ADMIN.name, username: DEMO_ADMIN.username, email: DEMO_ADMIN.email, role: "admin" }
+  ];
+  defaults.forEach((user) => {
+    const key = user.email || user.username;
+    if (!stored.some((item) => (item.email || item.username) === key)) stored.push(user);
   });
+  return stored;
 }
 
-async function deleteProductFromApi(productId) {
-  return apiFetch(`/products/${encodeURIComponent(productId)}`, { method: "DELETE" });
+function saveUsers(users) {
+  writeStorage(USER_LIST_KEY, users);
 }
 
 function normalizeCategory(value) {
   const normalized = String(value || "").trim().toLowerCase();
   if (normalized === "home") return "home-kitchen";
+  const match = categories.find((category) => category.name.toLowerCase() === normalized || category.value === normalized);
+  if (match) return match.value;
   return normalized;
 }
 
@@ -371,6 +372,14 @@ function ensureDemoProducts() {
       product.category = category;
       changed = true;
     }
+    if (!product.rating) {
+      product.rating = Number((4.2 + (Math.abs(String(product.id).length % 7) / 10)).toFixed(1));
+      changed = true;
+    }
+    if (!product.sold) {
+      product.sold = 0;
+      changed = true;
+    }
   });
 
   DEMO_PRODUCTS.forEach((product, index) => {
@@ -380,6 +389,8 @@ function ensureDemoProducts() {
       ...product,
       vendorEmail: DEMO_VENDOR.email,
       createdAt: Date.now() - index * 60000,
+      rating: Number((4.3 + ((index % 6) / 10)).toFixed(1)),
+      sold: 0,
       demoProduct: true
     });
     existingIds.add(product.id);
@@ -396,21 +407,6 @@ function getOrders() {
 
 function saveOrders(orders) {
   writeStorage(ORDER_KEY, orders);
-}
-
-async function loadOrdersFromApi() {
-  const user = getCurrentUser();
-  if (!user || !getAuthToken()) return getOrders();
-  try {
-    let path = `/orders/user/${user.id}`;
-    if (user.role === "vendor") path = `/orders/vendor/${user.id}`;
-    if (user.role === "admin") path = "/orders/admin";
-    const orders = await apiFetch(path);
-    if (Array.isArray(orders)) saveOrders(orders);
-    return orders;
-  } catch (error) {
-    return getOrders();
-  }
 }
 
 function getCart() {
@@ -446,11 +442,13 @@ function createProductFromForm(form) {
     stock: Number(formData.get("stock") || 0),
     image: (formData.get("image") || "").trim(),
     description: (formData.get("description") || "").trim(),
+    rating: existing?.rating || 4.5,
+    sold: existing?.sold || 0,
     createdAt: existing?.createdAt || Date.now()
   };
 }
 
-async function saveProduct(event) {
+function saveProduct(event) {
   if (event) event.preventDefault();
   if (!requireAnyRole(["vendor", "admin"])) return;
   const form = document.getElementById("addProductForm");
@@ -463,17 +461,11 @@ async function saveProduct(event) {
   }
   const products = getProducts();
   const index = products.findIndex((item) => String(item.id) === String(product.id));
-  try {
-    const saved = await saveProductToApi(product);
-    if (index >= 0) products[index] = saved;
-    else products.unshift(saved);
-  } catch (error) {
-    if (index >= 0) products[index] = product;
-    else products.unshift(product);
-    showToast("Backend offline. Product saved locally.");
-  }
+  if (index >= 0) products[index] = product;
+  else products.unshift(product);
   saveProducts(products);
   form.reset();
+  updateImagePreview();
   delete form.dataset.editingId;
   form.querySelector("button[type='submit']").textContent = "Save Product";
   showFormMessage(message, index >= 0 ? "Product updated successfully." : "Product saved successfully.", "success");
@@ -494,6 +486,11 @@ function addToCart(productId) {
   saveCart(cart);
   renderCart();
   showToast("Product added to cart");
+}
+
+function buyNow(productId) {
+  addToCart(productId);
+  if (getCurrentRole() === "customer") window.location.href = "cart.html";
 }
 
 function updateCartCount() {
@@ -541,46 +538,25 @@ function currentCartItems() {
   }).filter(Boolean);
 }
 
-async function createOrderInApi(items, payment) {
-  return apiFetch("/orders", {
-    method: "POST",
-    body: JSON.stringify({ items, payment })
-  });
-}
-
-async function startRazorpayPayment(total, items) {
+async function openRazorpayCheckout(total, items) {
   await loadRazorpayCheckout();
-  const paymentOrder = await apiFetch("/payment/create-order", {
-    method: "POST",
-    body: JSON.stringify({ amount: total })
-  });
   const user = getCurrentUser();
 
   return new Promise((resolve, reject) => {
+    // Replace frontend Razorpay test key with backend-generated order later for production security.
     const razorpay = new window.Razorpay({
-      key: paymentOrder.key,
-      amount: paymentOrder.order.amount,
-      currency: paymentOrder.order.currency,
+      key: RAZORPAY_TEST_KEY,
+      amount: Math.round(total * 100),
+      currency: "INR",
       name: "EMART",
-      description: "Cart checkout",
-      order_id: paymentOrder.order.id,
+      description: "Product Purchase",
       prefill: {
         name: user?.name || "",
         email: user?.email || ""
       },
-      theme: { color: "#ff7a00" },
-      handler: async (response) => {
-        try {
-          const verified = await apiFetch("/payment/verify", {
-            method: "POST",
-            body: JSON.stringify(response)
-          });
-          const order = await createOrderInApi(items, { ...verified, status: "Paid" });
-          resolve(order);
-        } catch (error) {
-          reject(error);
-        }
-      },
+      notes: { product_count: String(items.length) },
+      theme: { color: "#FF7A00" },
+      handler: (response) => resolve(response),
       modal: {
         ondismiss: () => reject(new Error("Payment cancelled"))
       }
@@ -589,33 +565,50 @@ async function startRazorpayPayment(total, items) {
   });
 }
 
+function saveOrderAfterPayment(payment, items, total) {
+  const user = getCurrentUser();
+  const orders = getOrders();
+  const order = {
+    id: `order-${Date.now()}`,
+    customerEmail: user?.email || "",
+    items,
+    total,
+    paymentId: payment.razorpay_payment_id || `demo-pay-${Date.now()}`,
+    status: "Paid",
+    createdAt: Date.now()
+  };
+  orders.unshift(order);
+  saveOrders(orders);
+  const products = getProducts();
+  items.forEach((item) => {
+    const product = products.find((entry) => String(entry.id) === String(item.productId || item.id));
+    if (product) {
+      product.sold = Number(product.sold || 0) + Number(item.quantity || 1);
+      product.stock = Math.max(0, Number(product.stock || 0) - Number(item.quantity || 1));
+    }
+  });
+  saveProducts(products);
+  return order;
+}
+
+function checkoutWithRazorpay() {
+  return placeOrder();
+}
+
 async function placeOrder() {
   if (!requireRole("customer")) return;
-  const user = getCurrentUser();
   const items = currentCartItems();
   if (!items.length) return;
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   showToast("Opening secure payment...");
   try {
-    const order = await startRazorpayPayment(total, items);
-    const orders = getOrders();
-    orders.unshift(order);
-    saveOrders(orders);
+    const payment = await openRazorpayCheckout(total, items);
+    const order = saveOrderAfterPayment(payment, items, total);
     saveCart([]);
     renderCart();
     showToast("Payment successful. Order confirmed.");
-    setTimeout(() => window.location.href = `order-confirmation.html?id=${encodeURIComponent(order.id)}`, 600);
+    setTimeout(() => window.location.href = `order-success.html?id=${encodeURIComponent(order.id)}`, 600);
   } catch (error) {
-    if (!getAuthToken()) {
-      const orders = getOrders();
-      orders.unshift({ id: `order-${Date.now()}`, customerEmail: user.email, items, total, status: "Demo Order", createdAt: Date.now() });
-      saveOrders(orders);
-      saveCart([]);
-      renderCart();
-      showToast("Demo order placed. Start backend for Razorpay payment.");
-      setTimeout(() => window.location.href = `order-confirmation.html?id=${encodeURIComponent(orders[0].id)}`, 600);
-      return;
-    }
     showToast(error.message || "Payment failed");
   }
 }
@@ -632,7 +625,7 @@ function renderOrderConfirmation() {
   host.innerHTML = `<span class="eyebrow">Payment success</span><h1>Order confirmed</h1><p>Your EMART order #${escapeHtml(order.id)} has been saved successfully.</p><div class="summary-line"><span>Total paid</span><strong>${formatRupees(order.total || order.total_amount)}</strong></div><div class="summary-line"><span>Status</span><strong>${escapeHtml(order.status)}</strong></div><div class="hero-actions"><a class="primary-button" href="products.html">Continue Shopping</a><a class="secondary-button" href="cart.html">View Orders</a></div>`;
 }
 
-async function deleteProduct(productId) {
+function deleteProduct(productId) {
   const role = getCurrentRole();
   const user = getCurrentUser();
   const product = getProducts().find((item) => String(item.id) === String(productId));
@@ -640,11 +633,6 @@ async function deleteProduct(productId) {
   if (role !== "admin" && !(role === "vendor" && product.vendorEmail === user?.email)) {
     alert("Access denied");
     return;
-  }
-  try {
-    await deleteProductFromApi(productId);
-  } catch (error) {
-    showToast("Backend offline. Product deleted locally.");
   }
   saveProducts(getProducts().filter((item) => String(item.id) !== String(productId)));
   saveCart(getCart().filter((item) => String(item.id) !== String(productId)));
@@ -677,6 +665,7 @@ function editProduct(productId) {
   form.elements.image.value = product.image;
   form.elements.description.value = product.description;
   form.querySelector("button[type='submit']").textContent = "Update Product";
+  updateImagePreview();
   form.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -705,7 +694,7 @@ function productCard(product) {
       ${product.discount ? `<span class="discount-tag">${product.discount}% OFF</span>` : ""}
     </a>
     <div class="product-card-body">
-      <span class="product-subtle">${escapeHtml(categoryLabel(product.category))}</span>
+      <div class="product-card-meta"><span class="product-subtle">${escapeHtml(categoryLabel(product.category))}</span><span class="rating-pill">★ ${Number(product.rating || 4.5).toFixed(1)}</span></div>
       <h3>${escapeHtml(product.name)}</h3>
       <p>${escapeHtml(description).slice(0, 92)}${description.length > 92 ? "..." : ""}</p>
       <div class="price-row"><span class="price-badge">${formatRupees(product.price)}</span>${product.oldPrice ? `<span class="old-price">${formatRupees(product.oldPrice)}</span>` : ""}</div>
@@ -716,6 +705,11 @@ function productCard(product) {
       </div>
     </div>
   </article>`;
+}
+
+function dealStripCard(product, label) {
+  if (!product) return "";
+  return `<article class="deal-strip-card glass-panel"><img src="${productImage(product)}" alt="${escapeHtml(product.name)}" /><div><span class="eyebrow">${label}</span><h3>${escapeHtml(product.name)}</h3><p>${escapeHtml(categoryLabel(product.category))} | ${Number(product.rating || 4.5).toFixed(1)} rating</p><strong>${formatRupees(product.price)}</strong></div><a class="secondary-button compact-button" href="product-details.html?id=${encodeURIComponent(product.id)}">View</a></article>`;
 }
 
 function emptyProductsMarkup() {
@@ -731,7 +725,14 @@ function renderProducts(hostId, productsToRender = getProducts()) {
 function renderCategoryRow() {
   const host = document.getElementById("categoryRow");
   if (!host) return;
-  host.innerHTML = categories.map((category) => `<article class="category-card" data-category-card="${category.value}"><div class="category-icon">${category.name.charAt(0)}</div><div><h3>${category.name}</h3><p>${category.description}</p></div></article>`).join("");
+  const activeCategory = normalizeCategory(new URLSearchParams(window.location.search).get("category") || "");
+  host.innerHTML = categories.map((category) => `<a class="category-card ${activeCategory === category.value ? "active" : ""}" href="products.html?category=${encodeURIComponent(category.value)}" data-category="${escapeHtml(category.name)}" data-category-card="${category.value}">
+    <img src="${category.image}" alt="${escapeHtml(category.name)} products" loading="lazy" />
+    <div class="category-card-copy">
+      <span class="category-icon">${category.name.charAt(0)}</span>
+      <div><h3>${category.name}</h3><p>${category.description}</p></div>
+    </div>
+  </a>`).join("");
 }
 
 function applyProductFilters() {
@@ -739,11 +740,14 @@ function applyProductFilters() {
   let filtered = getProducts().filter((product) => {
     const queryMatch = !query || [product.name, product.category, product.description].some((value) => String(value).toLowerCase().includes(query));
     const quickMatch = filterState.quick === "all" || (filterState.quick === "deal" ? Number(product.discount) > 0 : product.category === filterState.quick);
-    return queryMatch && quickMatch;
+    const price = Number(product.price || 0);
+    const priceMatch = filterState.price === "all" || (filterState.price === "under999" ? price <= 999 : filterState.price === "1000-2499" ? price >= 1000 && price <= 2499 : price >= 2500);
+    return queryMatch && quickMatch && priceMatch;
   });
   if (filterState.sort === "price-low") filtered.sort((a, b) => a.price - b.price);
   if (filterState.sort === "price-high") filtered.sort((a, b) => b.price - a.price);
   if (filterState.sort === "discount") filtered.sort((a, b) => b.discount - a.discount);
+  if (filterState.sort === "rating") filtered.sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0));
   if (filterState.sort === "newest") filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   return filtered;
 }
@@ -760,8 +764,16 @@ function updateProductPage() {
 function renderHomePage() {
   const products = getProducts();
   renderCategoryRow();
+  const sortedDeals = [...products].filter((item) => Number(item.discount) > 0).sort((a, b) => b.discount - a.discount);
+  const todayDeal = sortedDeals[0] || products[0];
   renderProducts("featuredProducts", products.slice(0, 4));
-  renderProducts("bestDeals", [...products].filter((item) => Number(item.discount) > 0).sort((a, b) => b.discount - a.discount).slice(0, 3));
+  renderProducts("bestDeals", sortedDeals.slice(0, 3));
+  renderProducts("under999Products", products.filter((item) => Number(item.price) <= 999).slice(0, 4));
+  renderProducts("topDiscountProducts", sortedDeals.slice(0, 4));
+  const todayHost = document.getElementById("todayBestDeal");
+  if (todayHost) todayHost.innerHTML = dealStripCard(todayDeal, "Today's best deal");
+  const vendorHost = document.getElementById("localVendorMarketplace");
+  if (vendorHost) vendorHost.innerHTML = `<article class="marketplace-card glass-panel"><span class="eyebrow">Local Vendor Marketplace</span><h2>${new Set(products.map((item) => item.vendorEmail).filter(Boolean)).size || 1} active seller${products.length === 1 ? "" : "s"}</h2><p>EMART helps small vendors list products, track stock, and manage orders from one simple dashboard.</p><a class="primary-button" href="login.html">Start Selling</a></article>`;
   const stat = document.getElementById("homeProductCount");
   if (stat) stat.textContent = products.length;
 }
@@ -769,9 +781,14 @@ function renderHomePage() {
 function renderProductsPage() {
   const params = new URLSearchParams(window.location.search);
   filterState.query = (params.get("q") || "").trim();
-  filterState.quick = params.get("deal") === "top" ? "deal" : "all";
+  filterState.quick = params.get("deal") === "top" ? "deal" : normalizeCategory(params.get("category") || "all");
+  filterState.price = params.get("price") || "all";
   const search = document.querySelector('.nav-search input[name="q"]');
   if (search) search.value = filterState.query;
+  const pageSearch = document.getElementById("productSearchInput");
+  if (pageSearch) pageSearch.value = filterState.query;
+  const priceSelect = document.getElementById("priceFilter");
+  if (priceSelect) priceSelect.value = filterState.price;
   document.querySelectorAll("[data-quick-filter]").forEach((button) => button.classList.toggle("active", button.dataset.quickFilter === filterState.quick));
   updateProductPage();
 }
@@ -791,8 +808,14 @@ function renderProductDetails() {
       <h1>${escapeHtml(product.name)}</h1>
       <p>${escapeHtml(product.description)}</p>
       <div class="price-row"><span class="price-badge">${formatRupees(product.price)}</span>${product.oldPrice ? `<span class="old-price">${formatRupees(product.oldPrice)}</span>` : ""}${product.discount ? `<span class="discount-tag">${product.discount}% OFF</span>` : ""}</div>
-      <p class="product-subtle">${Number(product.stock) > 0 ? `${product.stock} in stock` : "Out of stock"}</p>
-      <div class="hero-actions"><button class="primary-button" type="button" data-add-cart="${escapeHtml(product.id)}">Add to Cart</button><a class="secondary-button" href="products.html">Back to Products</a></div>
+      <div class="detail-trust-grid">
+        <span class="trust-pill">★ ${Number(product.rating || 4.5).toFixed(1)} rating</span>
+        <span class="trust-pill">${Number(product.stock) > 0 ? `${product.stock} in stock` : "Out of stock"}</span>
+        <span class="trust-pill">Fast delivery in 2-5 days</span>
+        <span class="trust-pill">7 day easy returns</span>
+      </div>
+      <p class="product-subtle">Secure Razorpay checkout, responsive customer support, and seller-managed local inventory.</p>
+      <div class="hero-actions"><button class="primary-button" type="button" data-add-cart="${escapeHtml(product.id)}">Add to Cart</button><button class="secondary-button" type="button" data-buy-now="${escapeHtml(product.id)}">Buy Now</button><a class="secondary-button" href="products.html">Back to Products</a></div>
     </article>`;
 }
 
@@ -823,8 +846,8 @@ function orderHistoryMarkup() {
   const user = getCurrentUser();
   if (!user) return "";
   const orders = getOrders().filter((order) => order.customerEmail === user.email || Number(order.user_id) === Number(user.id)).slice(0, 4);
-  if (!orders.length) return `<div class="order-history"><h3>Order history</h3><p class="product-subtle">Paid orders will appear here after checkout.</p></div>`;
-  return `<div class="order-history"><h3>Order history</h3>${orders.map((order) => `<article class="order-history-item"><strong>#${escapeHtml(order.id)}</strong><span>${formatRupees(order.total || order.total_amount)} | ${escapeHtml(order.status)}</span></article>`).join("")}</div>`;
+  if (!orders.length) return `<div class="order-history" id="orders"><h3>Order history</h3><p class="product-subtle">Paid orders will appear here after checkout.</p></div>`;
+  return `<div class="order-history" id="orders"><h3>Order history</h3>${orders.map((order) => `<article class="order-history-item"><strong>#${escapeHtml(order.id)}</strong><span>${formatRupees(order.total || order.total_amount)} | ${escapeHtml(order.status)}</span></article>`).join("")}</div>`;
 }
 
 function dashboardMetric(label, value, note) {
@@ -842,8 +865,18 @@ function productRows(products, allowActions = true) {
   </tr>`).join("") || `<tr><td colspan="${allowActions ? 6 : 5}">No products added yet.</td></tr>`;
 }
 
-function orderRows(orders) {
-  return orders.map((order) => `<tr data-search-row><td>${escapeHtml(order.id)}</td><td>${escapeHtml(order.customerEmail)}</td><td>${order.items.map((item) => escapeHtml(item.name)).join(", ")}</td><td>${formatRupees(order.total)}</td><td>${escapeHtml(order.status)}</td></tr>`).join("") || `<tr><td colspan="5">No orders yet.</td></tr>`;
+function vendorOrderTotal(order, vendorEmail) {
+  return (order.items || []).filter((item) => !vendorEmail || item.vendorEmail === vendorEmail).reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 1), 0);
+}
+
+function orderRows(orders, options = {}) {
+  const { editable = false, vendorEmail = "" } = options;
+  return orders.map((order) => {
+    const visibleItems = vendorEmail ? (order.items || []).filter((item) => item.vendorEmail === vendorEmail) : (order.items || []);
+    const total = vendorEmail ? vendorOrderTotal(order, vendorEmail) : (order.total || order.total_amount);
+    const statusCell = editable ? `<select class="status-select" data-order-status="${escapeHtml(order.id)}">${["Paid", "Pending", "Packed", "Shipped", "Delivered"].map((status) => `<option value="${status}" ${order.status === status ? "selected" : ""}>${status}</option>`).join("")}</select>` : escapeHtml(order.status);
+    return `<tr data-search-row><td>${escapeHtml(order.id)}</td><td>${escapeHtml(order.customerEmail)}</td><td>${visibleItems.map((item) => escapeHtml(item.name)).join(", ")}</td><td>${formatRupees(total)}</td><td>${statusCell}</td></tr>`;
+  }).join("") || `<tr><td colspan="5">No orders yet.</td></tr>`;
 }
 
 function renderVendorDashboard() {
@@ -852,8 +885,10 @@ function renderVendorDashboard() {
   const orders = getOrders().filter((order) => order.items.some((item) => item.vendorEmail === user?.email));
   const stock = products.reduce((sum, product) => sum + Number(product.stock || 0), 0);
   const lowStock = products.filter((product) => Number(product.stock) <= 5);
+  const earnings = orders.reduce((sum, order) => sum + vendorOrderTotal(order, user?.email), 0);
+  const bestSelling = [...products].sort((a, b) => Number(b.sold || 0) - Number(a.sold || 0))[0];
   const stats = document.getElementById("dashboardStats");
-  if (stats) stats.innerHTML = [dashboardMetric("My Products", products.length, "Vendor catalog"), dashboardMetric("Total Stock", stock, "Available units"), dashboardMetric("Vendor Orders", orders.length, "Orders with your products")].join("");
+  if (stats) stats.innerHTML = [dashboardMetric("My Products", products.length, "Vendor catalog"), dashboardMetric("Total Stock", stock, "Available units"), dashboardMetric("Vendor Orders", orders.length, "Orders with your products"), dashboardMetric("Vendor Earnings", formatRupees(earnings), "From paid local orders"), dashboardMetric("Best Seller", bestSelling?.name || "No sales yet", `${bestSelling?.sold || 0} sold`)].join("");
   const lowHost = document.getElementById("lowStockAlerts");
   if (lowHost) lowHost.innerHTML = lowStock.length ? lowStock.map((product) => `<article class="alert-item"><strong>${escapeHtml(product.name)}</strong><p>${product.stock} units left.</p></article>`).join("") : `<article class="empty-state"><p>No low stock products.</p></article>`;
   const recentHost = document.getElementById("recentProducts");
@@ -861,16 +896,22 @@ function renderVendorDashboard() {
   const table = document.getElementById("productsTableBody");
   if (table) table.innerHTML = productRows(products);
   const orderTable = document.getElementById("vendorOrdersBody");
-  if (orderTable) orderTable.innerHTML = orderRows(orders);
+  const bestHost = document.getElementById("bestSellingProduct");
+  if (bestHost) bestHost.innerHTML = bestSelling ? `<article class="recent-product"><img src="${productImage(bestSelling)}" alt="${escapeHtml(bestSelling.name)}" /><div><strong>${escapeHtml(bestSelling.name)}</strong><span>${bestSelling.sold || 0} sold | ${formatRupees(bestSelling.price)}</span></div></article>` : `<article class="empty-state"><p>No best-selling product yet.</p></article>`;
+  const recentOrders = document.getElementById("recentVendorOrders");
+  if (recentOrders) recentOrders.innerHTML = orderRows(orders.slice(0, 5), { vendorEmail: user?.email, editable: true });
+  if (orderTable) orderTable.innerHTML = orderRows(orders, { vendorEmail: user?.email, editable: true });
 }
 
 function renderAdminDashboard() {
   const products = getProducts();
   const orders = getOrders();
-  const vendors = [{ email: DEMO_VENDOR.email, name: DEMO_VENDOR.name }];
-  const customers = [{ email: DEMO_CUSTOMER.email, name: DEMO_CUSTOMER.name }];
+  const users = getUsers();
+  const vendors = users.filter((user) => user.role === "vendor");
+  const customers = users.filter((user) => user.role === "customer");
+  const paidOrders = orders.filter((order) => order.status === "Paid");
   const stats = document.getElementById("adminStats");
-  if (stats) stats.innerHTML = [dashboardMetric("Total Products", products.length, "All vendors"), dashboardMetric("Total Vendors", vendors.length, "Demo vendors"), dashboardMetric("Total Customers", customers.length, "Demo customers"), dashboardMetric("Total Orders", orders.length, "Placed orders")].join("");
+  if (stats) stats.innerHTML = [dashboardMetric("Total Products", products.length, "Saved catalog"), dashboardMetric("Total Vendors", vendors.length, "Registered vendors"), dashboardMetric("Total Customers", customers.length, "Registered customers"), dashboardMetric("Total Orders", orders.length, `${paidOrders.length} paid`)].join("");
   const vendorsBody = document.getElementById("vendorsTableBody");
   if (vendorsBody) vendorsBody.innerHTML = vendors.map((vendor) => `<tr><td>${vendor.name}</td><td>${vendor.email}</td><td>${products.filter((item) => item.vendorEmail === vendor.email).length}</td></tr>`).join("");
   const customersBody = document.getElementById("customersTableBody");
@@ -896,7 +937,17 @@ function renderManageProducts() {
 function renderVendorOrders() {
   const user = getCurrentUser();
   const body = document.getElementById("vendorOrdersBody");
-  if (body) body.innerHTML = orderRows(getOrders().filter((order) => order.items.some((item) => item.vendorEmail === user?.email)));
+  if (body) body.innerHTML = orderRows(getOrders().filter((order) => order.items.some((item) => item.vendorEmail === user?.email)), { vendorEmail: user?.email, editable: true });
+}
+
+function updateOrderStatus(orderId, status) {
+  const orders = getOrders();
+  const order = orders.find((item) => String(item.id) === String(orderId));
+  if (!order) return;
+  order.status = status;
+  saveOrders(orders);
+  renderRoleDashboards();
+  showToast("Order status updated");
 }
 
 function showToast(message) {
@@ -914,6 +965,21 @@ function showToast(message) {
 function updateNavbarByRole() {
   const role = getCurrentRole();
   document.body.dataset.role = role || "guest";
+  const menus = {
+    guest: [["Home", "index.html"], ["Products", "products.html"], ["Cart", "cart.html"], ["Login", "login.html"]],
+    customer: [["Home", "index.html"], ["Products", "products.html"], ["Cart", "cart.html"], ["Orders", "cart.html#orders"], ["Logout", "#logout"]],
+    vendor: [["Home", "index.html"], ["Products", "products.html"], ["Vendor Dashboard", "vendor-dashboard.html"], ["Add Product", "add-product.html"], ["Logout", "#logout"]],
+    admin: [["Home", "index.html"], ["Products", "products.html"], ["Admin Dashboard", "admin-dashboard.html"], ["Logout", "#logout"]]
+  };
+  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  document.querySelectorAll(".navbar .nav-links").forEach((nav) => {
+    nav.innerHTML = (menus[role || "guest"] || menus.guest).map(([label, href]) => {
+      const page = href.split("#")[0];
+      const active = page && page === currentPage ? " active" : "";
+      const logout = href === "#logout" ? " data-logout" : "";
+      return `<a href="${href}" class="nav-link${active}"${logout}>${label}</a>`;
+    }).join("");
+  });
   document.querySelectorAll("[data-role-only]").forEach((element) => {
     element.hidden = !element.dataset.roleOnly.split(" ").includes(role);
   });
@@ -922,6 +988,12 @@ function updateNavbarByRole() {
   });
   document.querySelectorAll("[data-admin-only]").forEach((element) => {
     element.hidden = role !== "admin";
+  });
+  document.querySelectorAll(".header-cart").forEach((cart) => {
+    cart.hidden = role === "vendor" || role === "admin";
+  });
+  document.querySelectorAll(".nav-actions .icon-button[href='cart.html']").forEach((cart) => {
+    cart.hidden = role === "vendor" || role === "admin";
   });
 }
 
@@ -932,12 +1004,14 @@ function getRoleMenuItems() {
       ["Home", "index.html"],
       ["Products", "products.html"],
       ["Cart", "cart.html"],
-      ["Testimonials", "testimonials.html"],
+      ["Orders", "cart.html#orders"],
       ["Logout", "#logout"]
     ];
   }
   if (role === "vendor") {
     return [
+      ["Home", "index.html"],
+      ["Products", "products.html"],
       ["Vendor Dashboard", "vendor-dashboard.html"],
       ["Add Product", "add-product.html"],
       ["Manage Products", "manage-products.html"],
@@ -947,6 +1021,8 @@ function getRoleMenuItems() {
   }
   if (role === "admin") {
     return [
+      ["Home", "index.html"],
+      ["Products", "products.html"],
       ["Admin Dashboard", "admin-dashboard.html"],
       ["Vendors", "admin-dashboard.html#vendors"],
       ["Customers", "admin-dashboard.html#customers"],
@@ -1049,6 +1125,8 @@ function attachEvents() {
   document.addEventListener("click", (event) => {
     const addButton = event.target.closest("[data-add-cart]");
     if (addButton) addToCart(addButton.dataset.addCart);
+    const buyButton = event.target.closest("[data-buy-now]");
+    if (buyButton) buyNow(buyButton.dataset.buyNow);
     const increase = event.target.closest("[data-increase]");
     if (increase) increaseQuantity(increase.dataset.increase);
     const decrease = event.target.closest("[data-decrease]");
@@ -1065,6 +1143,11 @@ function attachEvents() {
       document.querySelectorAll("[data-quick-filter]").forEach((button) => button.classList.toggle("active", button === quick));
       updateProductPage();
     }
+    const categoryCard = event.target.closest("[data-category-card]");
+    if (categoryCard) {
+      document.querySelectorAll("[data-category-card]").forEach((card) => card.classList.remove("active"));
+      categoryCard.classList.add("active");
+    }
     if (event.target.closest("[data-logout]") || event.target.closest("[data-admin-logout]")) logoutUser();
     if (event.target.closest("[data-place-order]")) placeOrder();
   });
@@ -1076,6 +1159,19 @@ function attachEvents() {
   document.getElementById("sortSelect")?.addEventListener("change", (event) => {
     filterState.sort = event.target.value;
     updateProductPage();
+  });
+  document.getElementById("priceFilter")?.addEventListener("change", (event) => {
+    filterState.price = event.target.value;
+    updateProductPage();
+  });
+  document.getElementById("productSearchInput")?.addEventListener("input", (event) => {
+    filterState.query = event.target.value.trim();
+    updateProductPage();
+  });
+  document.querySelector("[name='image']")?.addEventListener("input", updateImagePreview);
+  document.addEventListener("change", (event) => {
+    const status = event.target.closest("[data-order-status]");
+    if (status) updateOrderStatus(status.dataset.orderStatus, status.value);
   });
   document.querySelectorAll("[data-auth-tab]").forEach((tab) => tab.addEventListener("click", () => switchLoginTab(tab.dataset.authTab)));
   document.querySelectorAll("[data-sidebar-toggle]:not(#menuToggle)").forEach((toggle) => toggle.addEventListener("click", () => {
@@ -1115,6 +1211,15 @@ function attachMenuHighlight() {
 function loadEditProduct() {
   const id = new URLSearchParams(window.location.search).get("edit");
   if (id) editProduct(id);
+  updateImagePreview();
+}
+
+function updateImagePreview() {
+  const input = document.querySelector("[name='image']");
+  const preview = document.getElementById("productImagePreview");
+  if (!input || !preview) return;
+  const url = input.value.trim();
+  preview.innerHTML = url ? `<img src="${escapeHtml(url)}" alt="Product preview" />` : `<span>Image preview</span>`;
 }
 
 function ensureDemoVendor() {
@@ -1135,11 +1240,9 @@ function ensureDemoVendor() {
   if (changed) saveProducts(products);
 }
 
-async function init() {
+function init() {
   ensureDemoProducts();
   ensureDemoVendor();
-  await loadProductsFromApi();
-  await loadOrdersFromApi();
   protectCurrentPage();
   updateNavbarByRole();
   ensureHamburgerMenu();
@@ -1169,6 +1272,7 @@ async function init() {
 window.getCurrentRole = getCurrentRole;
 window.requireRole = requireRole;
 window.requireAnyRole = requireAnyRole;
+window.protectPage = protectPage;
 window.loginCustomer = loginCustomer;
 window.loginVendor = loginVendor;
 window.loginAdmin = loginAdmin;
@@ -1178,15 +1282,24 @@ window.checkAdmin = checkAdmin;
 window.adminLogin = adminLogin;
 window.adminLogout = adminLogout;
 window.saveProduct = saveProduct;
+window.addProduct = saveProduct;
 window.getProducts = getProducts;
 window.renderProducts = renderProducts;
 window.addToCart = addToCart;
+window.buyNow = buyNow;
 window.updateCartCount = updateCartCount;
 window.renderCart = renderCart;
 window.increaseQuantity = increaseQuantity;
 window.decreaseQuantity = decreaseQuantity;
 window.removeFromCart = removeFromCart;
 window.deleteProduct = deleteProduct;
+window.openRazorpayCheckout = openRazorpayCheckout;
+window.checkoutWithRazorpay = checkoutWithRazorpay;
+window.saveOrderAfterPayment = saveOrderAfterPayment;
+window.updateOrderStatus = updateOrderStatus;
+window.searchProducts = updateProductPage;
+window.filterProducts = updateProductPage;
+window.sortProducts = updateProductPage;
 
 init();
 attachHamburgerMenu();

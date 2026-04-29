@@ -104,6 +104,19 @@
           </div>
 
           <p class="product-subtle">Use the top category buttons and search bar to find saved products.</p>
+          <label class="form-field">
+            <span>Search catalog</span>
+            <input id="productSearchInput" type="search" placeholder="Search by name, category, description" />
+          </label>
+          <label class="form-field">
+            <span>Price range</span>
+            <select id="priceFilter" aria-label="Filter by price">
+              <option value="all">All prices</option>
+              <option value="under999">Under ₹999</option>
+              <option value="1000-2499">₹1,000 - ₹2,499</option>
+              <option value="2500plus">₹2,500+</option>
+            </select>
+          </label>
           <a class="primary-button sidebar-button" href="add-product.html" data-role-only="vendor admin" hidden>Add Product</a>
         </aside>
 
@@ -120,6 +133,7 @@
                   <option value="newest">Newest</option>
                   <option value="price-low">Price: Low to High</option>
                   <option value="price-high">Price: High to Low</option>
+                  <option value="rating">Top Rated</option>
                   <option value="discount">Best Discount</option>
                 </select>
               </label>
