@@ -3,6 +3,9 @@ const CART_KEY = "emartCart";
 const ORDER_KEY = "emartOrders";
 const ROLE_KEY = "emartUserRole";
 const USER_KEY = "emartCurrentUser";
+const TOKEN_KEY = "emartAuthToken";
+const API_BASE_URL = "http://localhost:5000/api";
+const RAZORPAY_CHECKOUT_URL = "https://checkout.razorpay.com/v1/checkout.js";
 const ADMIN_PASSWORD = "admin123";
 const DEMO_CUSTOMER = { email: "customer@emart.com", password: "customer123", name: "Customer Demo" };
 const DEMO_VENDOR = { email: "vendor@emart.com", password: "vendor123", name: "Vendor Demo" };
@@ -10,9 +13,146 @@ const DEMO_VENDOR = { email: "vendor@emart.com", password: "vendor123", name: "V
 const categories = [
   { name: "Electronics", description: "Audio, wearables, smart essentials", value: "electronics" },
   { name: "Fashion", description: "Modern fits and elevated basics", value: "fashion" },
-  { name: "Home", description: "Useful upgrades for every room", value: "home" },
+  { name: "Home & Kitchen", description: "Useful upgrades for every room", value: "home-kitchen" },
   { name: "Beauty", description: "Premium daily care picks", value: "beauty" },
-  { name: "Grocery", description: "Fresh pantry and daily needs", value: "grocery" }
+  { name: "Sports", description: "Active gear and training picks", value: "sports" },
+  { name: "Books", description: "Smart reads for study and focus", value: "books" },
+  { name: "Accessories", description: "Everyday carry and style extras", value: "accessories" }
+];
+
+const DEMO_PRODUCTS = [
+  {
+    id: "demo-wireless-bluetooth-earbuds",
+    name: "Wireless Bluetooth Earbuds",
+    category: "electronics",
+    price: 1299,
+    oldPrice: 2499,
+    discount: 45,
+    stock: 34,
+    image: "https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?auto=format&fit=crop&w=900&q=85",
+    description: "Glossy true wireless earbuds with rich bass, clear calls, and a pocket-friendly charging case."
+  },
+  {
+    id: "demo-smart-watch",
+    name: "Smart Watch",
+    category: "electronics",
+    price: 2499,
+    oldPrice: 3999,
+    discount: 35,
+    stock: 21,
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=85",
+    description: "Premium fitness smartwatch with health tracking, bright display, and all-day battery support."
+  },
+  {
+    id: "demo-gaming-keyboard",
+    name: "Gaming Keyboard",
+    category: "electronics",
+    price: 1799,
+    oldPrice: 2999,
+    discount: 40,
+    stock: 18,
+    image: "https://images.unsplash.com/photo-1541140532154-b024d705b90a?auto=format&fit=crop&w=900&q=85",
+    description: "Mechanical-style RGB keyboard built for fast typing, smooth gaming, and a sharp desk setup."
+  },
+  {
+    id: "demo-men-sneakers",
+    name: "Men Sneakers",
+    category: "fashion",
+    price: 1799,
+    oldPrice: 3599,
+    discount: 50,
+    stock: 27,
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=85",
+    description: "Lightweight street sneakers with cushioned soles and a clean finish for everyday outfits."
+  },
+  {
+    id: "demo-women-handbag",
+    name: "Women Handbag",
+    category: "fashion",
+    price: 2499,
+    oldPrice: 3999,
+    discount: 35,
+    stock: 16,
+    image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=900&q=85",
+    description: "Elegant structured handbag with premium texture, roomy storage, and polished metal accents."
+  },
+  {
+    id: "demo-bluetooth-speaker",
+    name: "Bluetooth Speaker",
+    category: "electronics",
+    price: 999,
+    oldPrice: 1999,
+    discount: 50,
+    stock: 30,
+    image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=900&q=85",
+    description: "Portable speaker with punchy sound, modern styling, and splash-resistant party-ready design."
+  },
+  {
+    id: "demo-coffee-mug-set",
+    name: "Coffee Mug Set",
+    category: "home-kitchen",
+    price: 799,
+    oldPrice: 999,
+    discount: 20,
+    stock: 55,
+    image: "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=900&q=85",
+    description: "Minimal ceramic mug set with a glossy finish, perfect for coffee corners and gifting."
+  },
+  {
+    id: "demo-skincare-kit",
+    name: "Skincare Kit",
+    category: "beauty",
+    price: 1299,
+    oldPrice: 1999,
+    discount: 35,
+    stock: 24,
+    image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=900&q=85",
+    description: "Daily glow skincare combo with cleanser, serum, and moisturizer for a fresh routine."
+  },
+  {
+    id: "demo-sports-shoes",
+    name: "Sports Shoes",
+    category: "sports",
+    price: 3999,
+    oldPrice: 6999,
+    discount: 45,
+    stock: 19,
+    image: "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=900&q=85",
+    description: "High-energy running shoes with breathable mesh, soft cushioning, and grippy outsoles."
+  },
+  {
+    id: "demo-travel-backpack",
+    name: "Travel Backpack",
+    category: "accessories",
+    price: 999,
+    oldPrice: 1799,
+    discount: 45,
+    stock: 38,
+    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=85",
+    description: "Smart everyday backpack with laptop space, clean pockets, and a durable urban look."
+  },
+  {
+    id: "demo-study-lamp",
+    name: "Study Lamp",
+    category: "home-kitchen",
+    price: 499,
+    oldPrice: 799,
+    discount: 35,
+    stock: 48,
+    image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=85",
+    description: "Adjustable desk lamp with focused warm light for late study sessions and tidy workspaces."
+  },
+  {
+    id: "demo-productivity-notebook",
+    name: "Productivity Notebook",
+    category: "books",
+    price: 499,
+    oldPrice: 999,
+    discount: 50,
+    stock: 60,
+    image: "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=900&q=85",
+    description: "Premium study notebook with smooth pages, sturdy binding, and a clean planning layout."
+  }
 ];
 
 const filterState = { quick: "all", query: "", sort: "newest" };
@@ -41,6 +181,22 @@ function getCurrentUser() {
 function setSession(role, user) {
   localStorage.setItem(ROLE_KEY, role);
   writeStorage(USER_KEY, { role, ...user });
+  if (user?.token) localStorage.setItem(TOKEN_KEY, user.token);
+}
+
+function getAuthToken() {
+  return localStorage.getItem(TOKEN_KEY) || "";
+}
+
+async function apiFetch(path, options = {}) {
+  const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+  const token = getAuthToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.message || "API request failed");
+  return data;
 }
 
 function requireRole(role) {
@@ -70,44 +226,72 @@ function protectCurrentPage() {
   if (page === "cart") requireRole("customer");
 }
 
-function loginCustomer(event) {
+async function loginWithApi({ email, password, role }) {
+  const result = await apiFetch("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password, role })
+  });
+  setSession(result.user.role, { ...result.user, token: result.token });
+  return result.user;
+}
+
+async function loginCustomer(event) {
   if (event) event.preventDefault();
   const email = document.getElementById("customerEmail")?.value.trim();
   const password = document.getElementById("customerPassword")?.value;
   const message = document.getElementById("customerLoginMessage");
-  if (email === DEMO_CUSTOMER.email && password === DEMO_CUSTOMER.password) {
-    setSession("customer", { email, name: DEMO_CUSTOMER.name });
+  try {
+    const user = await loginWithApi({ email, password, role: "customer" });
     showFormMessage(message, "Login successful, redirecting...", "success");
     setTimeout(() => window.location.href = "index.html", 450);
-  } else {
+  } catch (error) {
+    if (email === DEMO_CUSTOMER.email && password === DEMO_CUSTOMER.password) {
+      setSession("customer", { email, name: DEMO_CUSTOMER.name });
+      showFormMessage(message, "Backend offline. Demo login active.", "success");
+      setTimeout(() => window.location.href = "index.html", 450);
+      return;
+    }
     showFormMessage(message, "Wrong email or password.", "error");
   }
 }
 
-function loginVendor(event) {
+async function loginVendor(event) {
   if (event) event.preventDefault();
   const email = document.getElementById("vendorEmail")?.value.trim();
   const password = document.getElementById("vendorPassword")?.value;
   const message = document.getElementById("vendorLoginMessage");
-  if (email === DEMO_VENDOR.email && password === DEMO_VENDOR.password) {
-    setSession("vendor", { email, name: DEMO_VENDOR.name });
+  try {
+    await loginWithApi({ email, password, role: "vendor" });
     ensureDemoVendor();
     showFormMessage(message, "Login successful, redirecting...", "success");
     setTimeout(() => window.location.href = "vendor-dashboard.html", 450);
-  } else {
+  } catch (error) {
+    if (email === DEMO_VENDOR.email && password === DEMO_VENDOR.password) {
+      setSession("vendor", { email, name: DEMO_VENDOR.name });
+      ensureDemoVendor();
+      showFormMessage(message, "Backend offline. Demo login active.", "success");
+      setTimeout(() => window.location.href = "vendor-dashboard.html", 450);
+      return;
+    }
     showFormMessage(message, "Wrong email or password.", "error");
   }
 }
 
-function loginAdmin(event) {
+async function loginAdmin(event) {
   if (event) event.preventDefault();
   const password = document.getElementById("adminPassword")?.value;
   const message = document.getElementById("adminLoginMessage");
-  if (password === ADMIN_PASSWORD) {
-    setSession("admin", { email: "admin@emart.com", name: "Admin" });
+  try {
+    await loginWithApi({ email: "admin@emart.com", password, role: "admin" });
     showFormMessage(message, "Login successful, redirecting...", "success");
     setTimeout(() => window.location.href = "admin-dashboard.html", 450);
-  } else {
+  } catch (error) {
+    if (password === ADMIN_PASSWORD) {
+      setSession("admin", { email: "admin@emart.com", name: "Admin" });
+      showFormMessage(message, "Backend offline. Demo admin active.", "success");
+      setTimeout(() => window.location.href = "admin-dashboard.html", 450);
+      return;
+    }
     showFormMessage(message, "Wrong password.", "error");
   }
 }
@@ -115,6 +299,7 @@ function loginAdmin(event) {
 function logoutUser() {
   localStorage.removeItem(ROLE_KEY);
   localStorage.removeItem(USER_KEY);
+  localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem("emartAdminSession");
   window.location.href = "login.html";
 }
@@ -145,12 +330,87 @@ function saveProducts(products) {
   writeStorage(PRODUCT_KEY, products);
 }
 
+async function loadProductsFromApi() {
+  try {
+    const products = await apiFetch("/products");
+    if (Array.isArray(products)) saveProducts(products);
+    return products;
+  } catch (error) {
+    return getProducts();
+  }
+}
+
+async function saveProductToApi(product) {
+  const editing = getProducts().some((item) => String(item.id) === String(product.id));
+  const path = editing ? `/products/${encodeURIComponent(product.id)}` : "/products";
+  return apiFetch(path, {
+    method: editing ? "PUT" : "POST",
+    body: JSON.stringify(product)
+  });
+}
+
+async function deleteProductFromApi(productId) {
+  return apiFetch(`/products/${encodeURIComponent(productId)}`, { method: "DELETE" });
+}
+
+function normalizeCategory(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "home") return "home-kitchen";
+  return normalized;
+}
+
+function ensureDemoProducts() {
+  const products = getProducts();
+  const existingIds = new Set(products.map((product) => String(product.id)));
+  const existingNames = new Set(products.map((product) => String(product.name || "").trim().toLowerCase()));
+  let changed = false;
+
+  products.forEach((product) => {
+    const category = normalizeCategory(product.category);
+    if (product.category !== category) {
+      product.category = category;
+      changed = true;
+    }
+  });
+
+  DEMO_PRODUCTS.forEach((product, index) => {
+    const productName = product.name.trim().toLowerCase();
+    if (existingIds.has(product.id) || existingNames.has(productName)) return;
+    products.push({
+      ...product,
+      vendorEmail: DEMO_VENDOR.email,
+      createdAt: Date.now() - index * 60000,
+      demoProduct: true
+    });
+    existingIds.add(product.id);
+    existingNames.add(productName);
+    changed = true;
+  });
+
+  if (changed) saveProducts(products);
+}
+
 function getOrders() {
   return readStorage(ORDER_KEY, []);
 }
 
 function saveOrders(orders) {
   writeStorage(ORDER_KEY, orders);
+}
+
+async function loadOrdersFromApi() {
+  const user = getCurrentUser();
+  if (!user || !getAuthToken()) return getOrders();
+  try {
+    let path = `/orders/user/${user.id}`;
+    if (user.role === "vendor") path = `/orders/vendor/${user.id}`;
+    if (user.role === "admin") path = "/orders/admin";
+    const orders = await apiFetch(path);
+    if (Array.isArray(orders)) saveOrders(orders);
+    return orders;
+  } catch (error) {
+    return getOrders();
+  }
 }
 
 function getCart() {
@@ -179,7 +439,7 @@ function createProductFromForm(form) {
     id: editingId || `prod-${Date.now()}`,
     vendorEmail: existing?.vendorEmail || currentUser?.email || DEMO_VENDOR.email,
     name: (formData.get("name") || "").trim(),
-    category: (formData.get("category") || "").trim().toLowerCase(),
+    category: normalizeCategory(formData.get("category")),
     price: Number(formData.get("price") || 0),
     oldPrice: Number(formData.get("oldPrice") || 0),
     discount: Number(formData.get("discount") || 0),
@@ -190,7 +450,7 @@ function createProductFromForm(form) {
   };
 }
 
-function saveProduct(event) {
+async function saveProduct(event) {
   if (event) event.preventDefault();
   if (!requireAnyRole(["vendor", "admin"])) return;
   const form = document.getElementById("addProductForm");
@@ -203,8 +463,15 @@ function saveProduct(event) {
   }
   const products = getProducts();
   const index = products.findIndex((item) => String(item.id) === String(product.id));
-  if (index >= 0) products[index] = product;
-  else products.unshift(product);
+  try {
+    const saved = await saveProductToApi(product);
+    if (index >= 0) products[index] = saved;
+    else products.unshift(saved);
+  } catch (error) {
+    if (index >= 0) products[index] = product;
+    else products.unshift(product);
+    showToast("Backend offline. Product saved locally.");
+  }
   saveProducts(products);
   form.reset();
   delete form.dataset.editingId;
@@ -226,7 +493,7 @@ function addToCart(productId) {
   else cart.push({ id: product.id, quantity: 1 });
   saveCart(cart);
   renderCart();
-  showToast("Added to cart");
+  showToast("Product added to cart");
 }
 
 function updateCartCount() {
@@ -255,25 +522,117 @@ function removeFromCart(productId) {
   renderCart();
 }
 
-function placeOrder() {
-  if (!requireRole("customer")) return;
-  const user = getCurrentUser();
-  const products = getProducts();
-  const items = getCart().map((cartItem) => {
-    const product = products.find((item) => String(item.id) === String(cartItem.id));
-    return product ? { productId: product.id, vendorEmail: product.vendorEmail, name: product.name, price: product.price, quantity: cartItem.quantity } : null;
-  }).filter(Boolean);
-  if (!items.length) return;
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const orders = getOrders();
-  orders.unshift({ id: `order-${Date.now()}`, customerEmail: user.email, items, total, status: "Placed", createdAt: Date.now() });
-  saveOrders(orders);
-  saveCart([]);
-  renderCart();
-  showToast("Order placed successfully");
+function loadRazorpayCheckout() {
+  return new Promise((resolve, reject) => {
+    if (window.Razorpay) return resolve();
+    const script = document.createElement("script");
+    script.src = RAZORPAY_CHECKOUT_URL;
+    script.onload = resolve;
+    script.onerror = () => reject(new Error("Unable to load Razorpay checkout"));
+    document.body.append(script);
+  });
 }
 
-function deleteProduct(productId) {
+function currentCartItems() {
+  const products = getProducts();
+  return getCart().map((cartItem) => {
+    const product = products.find((item) => String(item.id) === String(cartItem.id));
+    return product ? { productId: product.id, id: product.id, vendorEmail: product.vendorEmail, name: product.name, price: product.price, quantity: cartItem.quantity } : null;
+  }).filter(Boolean);
+}
+
+async function createOrderInApi(items, payment) {
+  return apiFetch("/orders", {
+    method: "POST",
+    body: JSON.stringify({ items, payment })
+  });
+}
+
+async function startRazorpayPayment(total, items) {
+  await loadRazorpayCheckout();
+  const paymentOrder = await apiFetch("/payment/create-order", {
+    method: "POST",
+    body: JSON.stringify({ amount: total })
+  });
+  const user = getCurrentUser();
+
+  return new Promise((resolve, reject) => {
+    const razorpay = new window.Razorpay({
+      key: paymentOrder.key,
+      amount: paymentOrder.order.amount,
+      currency: paymentOrder.order.currency,
+      name: "EMART",
+      description: "Cart checkout",
+      order_id: paymentOrder.order.id,
+      prefill: {
+        name: user?.name || "",
+        email: user?.email || ""
+      },
+      theme: { color: "#ff7a00" },
+      handler: async (response) => {
+        try {
+          const verified = await apiFetch("/payment/verify", {
+            method: "POST",
+            body: JSON.stringify(response)
+          });
+          const order = await createOrderInApi(items, { ...verified, status: "Paid" });
+          resolve(order);
+        } catch (error) {
+          reject(error);
+        }
+      },
+      modal: {
+        ondismiss: () => reject(new Error("Payment cancelled"))
+      }
+    });
+    razorpay.open();
+  });
+}
+
+async function placeOrder() {
+  if (!requireRole("customer")) return;
+  const user = getCurrentUser();
+  const items = currentCartItems();
+  if (!items.length) return;
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  showToast("Opening secure payment...");
+  try {
+    const order = await startRazorpayPayment(total, items);
+    const orders = getOrders();
+    orders.unshift(order);
+    saveOrders(orders);
+    saveCart([]);
+    renderCart();
+    showToast("Payment successful. Order confirmed.");
+    setTimeout(() => window.location.href = `order-confirmation.html?id=${encodeURIComponent(order.id)}`, 600);
+  } catch (error) {
+    if (!getAuthToken()) {
+      const orders = getOrders();
+      orders.unshift({ id: `order-${Date.now()}`, customerEmail: user.email, items, total, status: "Demo Order", createdAt: Date.now() });
+      saveOrders(orders);
+      saveCart([]);
+      renderCart();
+      showToast("Demo order placed. Start backend for Razorpay payment.");
+      setTimeout(() => window.location.href = `order-confirmation.html?id=${encodeURIComponent(orders[0].id)}`, 600);
+      return;
+    }
+    showToast(error.message || "Payment failed");
+  }
+}
+
+function renderOrderConfirmation() {
+  const host = document.getElementById("orderConfirmation");
+  if (!host) return;
+  const id = new URLSearchParams(window.location.search).get("id");
+  const order = getOrders().find((item) => String(item.id) === String(id));
+  if (!order) {
+    host.innerHTML = `<span class="eyebrow">Order</span><h1>Order not found</h1><p class="product-subtle">Your order may still be syncing from the backend.</p><a class="primary-button" href="products.html">Continue Shopping</a>`;
+    return;
+  }
+  host.innerHTML = `<span class="eyebrow">Payment success</span><h1>Order confirmed</h1><p>Your EMART order #${escapeHtml(order.id)} has been saved successfully.</p><div class="summary-line"><span>Total paid</span><strong>${formatRupees(order.total || order.total_amount)}</strong></div><div class="summary-line"><span>Status</span><strong>${escapeHtml(order.status)}</strong></div><div class="hero-actions"><a class="primary-button" href="products.html">Continue Shopping</a><a class="secondary-button" href="cart.html">View Orders</a></div>`;
+}
+
+async function deleteProduct(productId) {
   const role = getCurrentRole();
   const user = getCurrentUser();
   const product = getProducts().find((item) => String(item.id) === String(productId));
@@ -281,6 +640,11 @@ function deleteProduct(productId) {
   if (role !== "admin" && !(role === "vendor" && product.vendorEmail === user?.email)) {
     alert("Access denied");
     return;
+  }
+  try {
+    await deleteProductFromApi(productId);
+  } catch (error) {
+    showToast("Backend offline. Product deleted locally.");
   }
   saveProducts(getProducts().filter((item) => String(item.id) !== String(productId)));
   saveCart(getCart().filter((item) => String(item.id) !== String(productId)));
@@ -345,6 +709,7 @@ function productCard(product) {
       <h3>${escapeHtml(product.name)}</h3>
       <p>${escapeHtml(description).slice(0, 92)}${description.length > 92 ? "..." : ""}</p>
       <div class="price-row"><span class="price-badge">${formatRupees(product.price)}</span>${product.oldPrice ? `<span class="old-price">${formatRupees(product.oldPrice)}</span>` : ""}</div>
+      <span class="stock-pill">${Number(product.stock) > 0 ? `${product.stock} in stock` : "Out of stock"}</span>
       <div class="product-bottom">
         <button class="action-button" type="button" data-add-cart="${escapeHtml(product.id)}">Add to Cart</button>
         <a class="secondary-button compact-button" href="product-details.html?id=${encodeURIComponent(product.id)}">View Details</a>
@@ -441,7 +806,7 @@ function renderCart() {
   }).filter(Boolean);
   if (!cartItems.length) {
     itemsHost.innerHTML = `<article class="empty-state"><h2>Your cart is empty</h2><p>Add products from the catalog to see them here.</p><a class="primary-button" href="products.html">Shop Products</a></article>`;
-    summaryHost.innerHTML = `<h2>Cart total</h2><p class="product-subtle">No items selected.</p><strong class="cart-total">${formatRupees(0)}</strong>`;
+    summaryHost.innerHTML = `<h2>Cart total</h2><p class="product-subtle">No items selected.</p><strong class="cart-total">${formatRupees(0)}</strong>${orderHistoryMarkup()}`;
     return;
   }
   itemsHost.innerHTML = cartItems.map((item) => `<article class="cart-row">
@@ -451,7 +816,15 @@ function renderCart() {
     <button class="ghost-button" type="button" data-remove-cart="${escapeHtml(item.id)}">Remove</button>
   </article>`).join("");
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  summaryHost.innerHTML = `<span class="eyebrow">Order summary</span><h2>Cart total</h2><div class="summary-line"><span>Items</span><strong>${cartItems.reduce((sum, item) => sum + item.quantity, 0)}</strong></div><div class="summary-line"><span>Total</span><strong>${formatRupees(total)}</strong></div><button class="primary-button checkout-button" type="button" data-place-order>Checkout</button><p class="form-message" id="orderMessage"></p>`;
+  summaryHost.innerHTML = `<span class="eyebrow">Order summary</span><h2>Cart total</h2><div class="summary-line"><span>Items</span><strong>${cartItems.reduce((sum, item) => sum + item.quantity, 0)}</strong></div><div class="summary-line"><span>Total</span><strong>${formatRupees(total)}</strong></div><button class="primary-button checkout-button" type="button" data-place-order>Pay Now</button><p class="form-message" id="orderMessage"></p>${orderHistoryMarkup()}`;
+}
+
+function orderHistoryMarkup() {
+  const user = getCurrentUser();
+  if (!user) return "";
+  const orders = getOrders().filter((order) => order.customerEmail === user.email || Number(order.user_id) === Number(user.id)).slice(0, 4);
+  if (!orders.length) return `<div class="order-history"><h3>Order history</h3><p class="product-subtle">Paid orders will appear here after checkout.</p></div>`;
+  return `<div class="order-history"><h3>Order history</h3>${orders.map((order) => `<article class="order-history-item"><strong>#${escapeHtml(order.id)}</strong><span>${formatRupees(order.total || order.total_amount)} | ${escapeHtml(order.status)}</span></article>`).join("")}</div>`;
 }
 
 function dashboardMetric(label, value, note) {
@@ -748,6 +1121,11 @@ function ensureDemoVendor() {
   const products = getProducts();
   let changed = false;
   products.forEach((product) => {
+    const category = normalizeCategory(product.category);
+    if (product.category !== category) {
+      product.category = category;
+      changed = true;
+    }
     if (!product.vendorEmail) {
       product.vendorEmail = DEMO_VENDOR.email;
       product.createdAt = product.createdAt || Date.now();
@@ -757,8 +1135,11 @@ function ensureDemoVendor() {
   if (changed) saveProducts(products);
 }
 
-function init() {
+async function init() {
+  ensureDemoProducts();
   ensureDemoVendor();
+  await loadProductsFromApi();
+  await loadOrdersFromApi();
   protectCurrentPage();
   updateNavbarByRole();
   ensureHamburgerMenu();
@@ -771,6 +1152,7 @@ function init() {
   if (page === "products") renderProductsPage();
   if (page === "product-details") renderProductDetails();
   if (page === "cart") renderCart();
+  if (page === "order-confirmation") renderOrderConfirmation();
   if (["vendor-dashboard", "dashboard"].includes(page)) {
     renderVendorDashboard();
     attachDashboardSearch();
